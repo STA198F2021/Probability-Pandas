@@ -9,7 +9,7 @@ output: pdf_document
 ```{r load-packages-data, message = FALSE, warning = FALSE, echo=FALSE}
 library(tidyverse)
 
-initial_data = read.csv("~/Probability Pandas Project/data/500_Cities.csv")
+initial_data <- read.csv("/500_Cities.csv")
 
 cities <- initial_data %>%
   select(StateAbbr, PlaceName, PlaceFIPS, Geolocation, ACCESS2_AdjPrev, 
