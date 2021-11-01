@@ -15,7 +15,7 @@ library(tidyverse)
 # Load Data
 ```{r load-data, message = F}
 
-initial_data = read.csv("~/Probability Pandas Project/data/500_Cities__City-level_Data__GIS_Friendly_Format___2018_release.csv")
+initial_data = read.csv("~/Probability Pandas Project/data/500_Cities.csv")
 
 cities <- initial_data %>%
   select(StateAbbr, PlaceName, PlaceFIPS, Geolocation, ACCESS2_AdjPrev, 
