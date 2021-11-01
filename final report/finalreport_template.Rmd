@@ -1,7 +1,41 @@
 ---
 title: "Final Report"
 subtitle: "due November 16, 2021 by 11:59 PM "
-author: "Your names and team name here"
-date: ""
+author: "Enzo, Layla, Madeleine"
+date: "November 16, 2021"
 output: pdf_document
 ---
+
+```{r load-packages-data, message = FALSE, warning = FALSE, echo=FALSE}
+library(tidyverse)
+
+initial_data = read.csv("~/Probability Pandas Project/data/500_Cities.csv")
+
+cities <- initial_data %>%
+  select(StateAbbr, PlaceName, PlaceFIPS, Geolocation, ACCESS2_AdjPrev, 
+         ACCESS2_Adj95CI, CANCER_AdjPrev, CANCER_Adj95CI, CHD_AdjPrev, 
+         CHD_Adj95CI, CHECKUP_AdjPrev, CHECKUP_Adj95CI, COPD_AdjPrev, 
+         COPD_Adj95CI, COLON_SCREEN_AdjPrev, COLON_SCREEN_Adj95CI, 
+         COREM_AdjPrev, COREM_Adj95CI, COREW_AdjPrev, COREW_Adj95CI, 
+         KIDNEY_AdjPrev, KIDNEY_Adj95CI, MAMMOUSE_AdjPrev, MAMMOUSE_Adj95CI, 
+         PAPTEST_AdjPrev, PAPTEST_Adj95CI) %>%
+  rename(state = StateAbbr, city = PlaceName, 
+         health_access = ACCESS2_AdjPrev, 
+         health_access_CI = ACCESS2_Adj95CI, cancer = CANCER_AdjPrev, 
+         cancer_CI = CANCER_Adj95CI, heart_disease = CHD_AdjPrev, 
+         heart_disease_CI = CHD_Adj95CI, checkup = CHECKUP_AdjPrev, 
+         checkup_CI = CHECKUP_Adj95CI, chronic_lung_disease = COPD_AdjPrev,
+         chronic_lung_disease_CI = COPD_Adj95CI, 
+         colon_screen = COLON_SCREEN_AdjPrev, 
+         colon_screen_CI = COLON_SCREEN_Adj95CI, 
+         men_colorectal_cancer_screen = COREM_AdjPrev, 
+         men_colorectal_cancer_screen_CI = COREM_Adj95CI, 
+         women_colorectal_cancer_screen = COREW_AdjPrev, 
+         women_colorectal_cancer_screen_CI = COREW_Adj95CI, 
+         chronic_kidney_disease = KIDNEY_AdjPrev, 
+         chronic_kidney_disease_CI = KIDNEY_Adj95CI, 
+         mammogram = MAMMOUSE_AdjPrev, 
+         mammogram_CI = MAMMOUSE_Adj95CI, pap_test = PAPTEST_AdjPrev, 
+         pap_test_CI = PAPTEST_Adj95CI)
+``` 
+
