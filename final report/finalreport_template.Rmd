@@ -4,37 +4,96 @@ subtitle: "due November 16, 2021 by 11:59 PM "
 author: "Enzo, Layla, Madeleine"
 date: "November 16, 2021"
 output: pdf_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r load-packages-data, message = FALSE, warning = FALSE, echo=FALSE}
 library(tidyverse)
+library(tidymodels)
+library(infer)
+library(readr)
 initial_data <- read_csv("../data/500_Cities.csv")
 
+# cities <- initial_data %>%
+#   select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, ACCESS2_AdjPrev,
+#          ACCESS2_Adj95CI, CANCER_AdjPrev, CANCER_Adj95CI, CHD_AdjPrev,
+#          CHD_Adj95CI, CHECKUP_AdjPrev, CHECKUP_Adj95CI, COPD_AdjPrev,
+#          COPD_Adj95CI, COLON_SCREEN_AdjPrev, COLON_SCREEN_Adj95CI,
+#          COREM_AdjPrev, COREM_Adj95CI, COREW_AdjPrev, COREW_Adj95CI,
+#          KIDNEY_AdjPrev, KIDNEY_Adj95CI, MAMMOUSE_AdjPrev, MAMMOUSE_Adj95CI,
+#          PAPTEST_AdjPrev, PAPTEST_Adj95CI) %>%
+#   rename(state = StateAbbr, city = PlaceName, Population = Population2010,
+#          health_access = ACCESS2_AdjPrev,
+#          health_access_CI = ACCESS2_Adj95CI, cancer = CANCER_AdjPrev,
+#          cancer_CI = CANCER_Adj95CI, heart_disease = CHD_AdjPrev,
+#          heart_disease_CI = CHD_Adj95CI, checkup = CHECKUP_AdjPrev,
+#          checkup_CI = CHECKUP_Adj95CI, chronic_lung_disease = COPD_AdjPrev,
+#          chronic_lung_disease_CI = COPD_Adj95CI,
+#          colon_screen = COLON_SCREEN_AdjPrev,
+#          colon_screen_CI = COLON_SCREEN_Adj95CI,
+#          men_colorectal_cancer_screen = COREM_AdjPrev,
+#          men_colorectal_cancer_screen_CI = COREM_Adj95CI,
+#          women_colorectal_cancer_screen = COREW_AdjPrev,
+#          women_colorectal_cancer_screen_CI = COREW_Adj95CI,
+#          chronic_kidney_disease = KIDNEY_AdjPrev,
+#          chronic_kidney_disease_CI = KIDNEY_Adj95CI,
+#          mammogram = MAMMOUSE_AdjPrev,
+#          mammogram_CI = MAMMOUSE_Adj95CI, pap_test = PAPTEST_AdjPrev,
+#          pap_test_CI = PAPTEST_Adj95CI)
+
 cities <- initial_data %>%
-  select(StateAbbr, PlaceName, PlaceFIPS, Geolocation, ACCESS2_AdjPrev, 
-         ACCESS2_Adj95CI, CANCER_AdjPrev, CANCER_Adj95CI, CHD_AdjPrev, 
-         CHD_Adj95CI, CHECKUP_AdjPrev, CHECKUP_Adj95CI, COPD_AdjPrev, 
-         COPD_Adj95CI, COLON_SCREEN_AdjPrev, COLON_SCREEN_Adj95CI, 
-         COREM_AdjPrev, COREM_Adj95CI, COREW_AdjPrev, COREW_Adj95CI, 
-         KIDNEY_AdjPrev, KIDNEY_Adj95CI, MAMMOUSE_AdjPrev, MAMMOUSE_Adj95CI, 
-         PAPTEST_AdjPrev, PAPTEST_Adj95CI) %>%
-  rename(state = StateAbbr, city = PlaceName, 
-         health_access = ACCESS2_AdjPrev, 
-         health_access_CI = ACCESS2_Adj95CI, cancer = CANCER_AdjPrev, 
-         cancer_CI = CANCER_Adj95CI, heart_disease = CHD_AdjPrev, 
-         heart_disease_CI = CHD_Adj95CI, checkup = CHECKUP_AdjPrev, 
-         checkup_CI = CHECKUP_Adj95CI, chronic_lung_disease = COPD_AdjPrev,
-         chronic_lung_disease_CI = COPD_Adj95CI, 
-         colon_screen = COLON_SCREEN_AdjPrev, 
-         colon_screen_CI = COLON_SCREEN_Adj95CI, 
-         men_colorectal_cancer_screen = COREM_AdjPrev, 
-         men_colorectal_cancer_screen_CI = COREM_Adj95CI, 
-         women_colorectal_cancer_screen = COREW_AdjPrev, 
-         women_colorectal_cancer_screen_CI = COREW_Adj95CI, 
-         chronic_kidney_disease = KIDNEY_AdjPrev, 
-         chronic_kidney_disease_CI = KIDNEY_Adj95CI, 
+  select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, 
+         ACCESS2_AdjPrev,CANCER_AdjPrev, CHD_AdjPrev, CHECKUP_AdjPrev,
+         COPD_AdjPrev, COLON_SCREEN_AdjPrev,COREM_AdjPrev, COREW_AdjPrev, 
+         KIDNEY_AdjPrev, MAMMOUSE_AdjPrev, PAPTEST_AdjPrev) %>%
+  rename(state = StateAbbr, city = PlaceName, population = Population2010,
+         health_access = ACCESS2_AdjPrev, cancer = CANCER_AdjPrev, 
+         heart_disease = CHD_AdjPrev, checkup = CHECKUP_AdjPrev,
+         chronic_lung_disease = COPD_AdjPrev, 
+         colon_screen = COLON_SCREEN_AdjPrev,
+         men_colorectal_cancer_screen = COREM_AdjPrev,
+         women_colorectal_cancer_screen = COREW_AdjPrev,
+         chronic_kidney_disease = KIDNEY_AdjPrev,
          mammogram = MAMMOUSE_AdjPrev, 
-         mammogram_CI = MAMMOUSE_Adj95CI, pap_test = PAPTEST_AdjPrev, 
-         pap_test_CI = PAPTEST_Adj95CI)
+         pap_test = PAPTEST_AdjPrev) %>%
+  mutate(large_metro = (population >= 1500000), 
+         metro = (population >= 500000 & population < 1500000), 
+         med_urban = (population >= 200000 & population < 500000), 
+         small_urban = (population >= 50000 & population < 200000)) %>%
+  mutate(west = (state %in% c("WA", "OR", "ID", "MT", "WY", "CA", "NV", "UT", 
+                              "CO", "AZ", "NM")), 
+         midwest = (state %in% c("ND", "SD", "NE", "KS", "MN", "IA", "MO", 
+                                 "WI", "IL", "IN", "MI", "OH")),
+         northeast = (state %in% c("PA", "NY", "VT", "NH", "MA", "CT", "RI", 
+                                   "NJ", "ME")))
+         #south = ())
+
+cities%>%
+  filter(state == "IL") %>%
+  select(midwest)
 ``` 
 
+# Visualisations
+
+```{r ANOVA}
+
+cities %>%
+  ggplot(aes(x = exp(health_access))) +
+    geom_histogram() +
+    facet_wrap(~state, ncol = 4) +
+    labs(x = "Lack of Access to Health Care", y = NULL)
+
+```
+
+```{r Regression-Model}
+
+
+
+```
+
+```{r Regression-Visualisation}
+
+
+
+```
