@@ -15,33 +15,6 @@ library(infer)
 library(readr)
 initial_data <- read_csv("../data/500_Cities.csv")
 
-# cities <- initial_data %>%
-#   select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, ACCESS2_AdjPrev,
-#          ACCESS2_Adj95CI, CANCER_AdjPrev, CANCER_Adj95CI, CHD_AdjPrev,
-#          CHD_Adj95CI, CHECKUP_AdjPrev, CHECKUP_Adj95CI, COPD_AdjPrev,
-#          COPD_Adj95CI, COLON_SCREEN_AdjPrev, COLON_SCREEN_Adj95CI,
-#          COREM_AdjPrev, COREM_Adj95CI, COREW_AdjPrev, COREW_Adj95CI,
-#          KIDNEY_AdjPrev, KIDNEY_Adj95CI, MAMMOUSE_AdjPrev, MAMMOUSE_Adj95CI,
-#          PAPTEST_AdjPrev, PAPTEST_Adj95CI) %>%
-#   rename(state = StateAbbr, city = PlaceName, Population = Population2010,
-#          health_access = ACCESS2_AdjPrev,
-#          health_access_CI = ACCESS2_Adj95CI, cancer = CANCER_AdjPrev,
-#          cancer_CI = CANCER_Adj95CI, heart_disease = CHD_AdjPrev,
-#          heart_disease_CI = CHD_Adj95CI, checkup = CHECKUP_AdjPrev,
-#          checkup_CI = CHECKUP_Adj95CI, chronic_lung_disease = COPD_AdjPrev,
-#          chronic_lung_disease_CI = COPD_Adj95CI,
-#          colon_screen = COLON_SCREEN_AdjPrev,
-#          colon_screen_CI = COLON_SCREEN_Adj95CI,
-#          men_colorectal_cancer_screen = COREM_AdjPrev,
-#          men_colorectal_cancer_screen_CI = COREM_Adj95CI,
-#          women_colorectal_cancer_screen = COREW_AdjPrev,
-#          women_colorectal_cancer_screen_CI = COREW_Adj95CI,
-#          chronic_kidney_disease = KIDNEY_AdjPrev,
-#          chronic_kidney_disease_CI = KIDNEY_Adj95CI,
-#          mammogram = MAMMOUSE_AdjPrev,
-#          mammogram_CI = MAMMOUSE_Adj95CI, pap_test = PAPTEST_AdjPrev,
-#          pap_test_CI = PAPTEST_Adj95CI)
-
 cities <- initial_data %>%
   select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, 
          ACCESS2_AdjPrev,CANCER_AdjPrev, CHD_AdjPrev, CHECKUP_AdjPrev,
@@ -85,7 +58,14 @@ cities <- initial_data %>%
          w_colorectal_n_screened = 
            (population*(women_colorectal_cancer_screen/100)),
          mammogram_n_screened = (population*(mammogram/100)),
-         pap_n_screened = (population*(pap_test/100)))
+         pap_n_screened = (population*(pap_test/100))) %>%
+  mutate(no_checkup_n = (population - checkup_n), 
+         no_colon_n_screened = (population - colon_n_screened), 
+         no_m_colorectal_n_screened = (population - m_colorectal_n_screened),
+         no_w_colorectal_n_screened = 
+           (population - w_colorectal_n_screened),
+         no_mammogram_n_screened = (population - mammogram_n_screened),
+         no_pap_n_screened = (population - pap_n_screened))
 
 west_cities <- cities %>%
   filter(west)
@@ -100,22 +80,36 @@ south_cities <- cities %>%
   filter(south)
 ``` 
 
-# Visualisations
+# Introductory Visualisations of Data Set
 
-```{r Marginal-Probabilities}
+```{r Simple-Marginal-Relationships}
+
+
+
+```
+
+```{r Predictor-Variable-Distribution}
 
 
 
 ```
 
 
-```{r Logistic-Regression-Model}
+# Multiple Logistic Regression Model for Research Question
 
+```{r Multiple-Logistic-Regression-Model, warning=FALSE}
 
+checkup_fit <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(as.factor(checkup) ~ region + city_size + health_access, data=cities, family="binomial")
+result<-tidy(checkup_fit, conf.int=TRUE)
+print(result)
+
+#can i add interaction variables/predictors to this logistic regression model?
 
 ```
 
-```{r Logistic-Regression-Visualisation}
+```{r Multiple-Logistic-Regression-Visualisation}
 
 
 
