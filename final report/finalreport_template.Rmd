@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r load-packages-data, message = FALSE, warning = FALSE, echo=FALSE}
+```{r load-packages-data, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(tidymodels)
 library(infer)
@@ -66,33 +66,56 @@ cities <- initial_data %>%
          midwest = (state %in% c("ND", "SD", "NE", "KS", "MN", "IA", "MO", 
                                  "WI", "IL", "IN", "MI", "OH")),
          northeast = (state %in% c("PA", "NY", "VT", "NH", "MA", "CT", "RI", 
-                                   "NJ", "ME")))
-         #south = ())
+                                   "NJ", "ME")), 
+         south = (state %in% c("OK", "TX", "AR", "LA", "MS", "AL", "TN", "KY", 
+                               "WV", "VA", "MD", "DE", "NC", "SC", "GA", "FL"))) %>%
+  mutate(region = ifelse(west == TRUE, "West", 
+                         ifelse(midwest == TRUE, "Midwest", 
+                                ifelse(northeast == TRUE, "Northeast", 
+                                       ifelse(south == TRUE, 
+                                              "South", "NA"))))) %>%
+  mutate(city_size = ifelse(large_metro == TRUE, "Large Metropolitan", 
+                         ifelse(metro == TRUE, "Metropolitan", 
+                                ifelse(med_urban == TRUE, "Medium-Size Urban", 
+                                       ifelse(small_urban == TRUE, 
+                                              "Small-Size Urban", "NA"))))) %>%
+  mutate(checkup_n = (population*(checkup/100)), 
+         colon_n_screened = (population*(colon_screen/100)), 
+         m_colorectal_n_screened = (population*(men_colorectal_cancer_screen/100)),
+         w_colorectal_n_screened = 
+           (population*(women_colorectal_cancer_screen/100)),
+         mammogram_n_screened = (population*(mammogram/100)),
+         pap_n_screened = (population*(pap_test/100)))
 
-cities%>%
-  filter(state == "IL") %>%
-  select(midwest)
+west_cities <- cities %>%
+  filter(west)
+
+midwest_cities <- cities %>%
+  filter(midwest)
+
+northeast_cities <- cities %>%
+  filter(northeast)
+
+south_cities <- cities %>%
+  filter(south)
 ``` 
 
 # Visualisations
 
-```{r ANOVA}
-
-cities %>%
-  ggplot(aes(x = exp(health_access))) +
-    geom_histogram() +
-    facet_wrap(~state, ncol = 4) +
-    labs(x = "Lack of Access to Health Care", y = NULL)
-
-```
-
-```{r Regression-Model}
+```{r Marginal-Probabilities}
 
 
 
 ```
 
-```{r Regression-Visualisation}
+
+```{r Logistic-Regression-Model}
+
+
+
+```
+
+```{r Logistic-Regression-Visualisation}
 
 
 
