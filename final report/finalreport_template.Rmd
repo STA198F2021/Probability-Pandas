@@ -13,7 +13,16 @@ library(tidyverse)
 library(tidymodels)
 library(infer)
 library(readr)
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(sf)
+library(plotly)
 initial_data <- read_csv("../data/500_Cities.csv")
+options(scipen=10000)
+
+usa <- map_data('usa')
+state <- map_data("state")
 
 cities <- initial_data %>%
   select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, 
@@ -82,15 +91,36 @@ south_cities <- cities %>%
 
 # Introductory Visualisations of Data Set
 
-```{r Simple-Marginal-Relationships}
+```{r Simple-Marginal-Relationship1} 
+cities1 <- cities %>%
+  na.omit(city_size)
+#some rows had NA functions and it made a weird empty column in my ggplot so i got rid of it using above code 
+ggplot(cities1, aes(x = city_size, 
+                   y = checkup_n, 
+                   fill = city_size))+ 
+  geom_bar( stat = 'identity')+ 
+  labs( x = "City Size", 
+        y = "People who got a Checkup",
+        title = "Number of Checkups by City Size") +
+  theme(axis.text.x = element_text(angle = 45,hjust=1))+ 
+  theme(legend.position = "none")
+#i did that last theme line bc i wanted to add some color 
 
-
-
+#i kinda hate the y-axis numbers here because they are huge --- added options(scipen=10000) to the first code chunk to make this but i think there's a diff way to get rid of scientific notation that i cannot remember atm 
 ```
 
+```{r Simple-Marginal-Relationship2}
+ggplot(cities, aes(x = health_access,
+                   y= colon_screen))+
+  geom_point()+ 
+  labs( x = "Lack of Health Care Access", 
+        y = "Number of People who got a Colon Screening",
+        title = "Number of Checkups by City Size")
+#want to find a way to organize by gender 
+```
+
+
 ```{r Predictor-Variable-Distribution}
-
-
 
 ```
 
