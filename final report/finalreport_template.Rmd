@@ -131,11 +131,20 @@ ggplot(cities, aes(x = health_access,
 
 checkup_fit <- logistic_reg() %>%
   set_engine("glm") %>%
-  fit(as.factor(checkup_n) ~ region + city_size + health_access, data=cities, family="binomial")
-result<-tidy(checkup_fit, conf.int=TRUE)
+  fit(as.factor(checkup_n) ~ region + city_size + health_access, data=cities, 
+      family="binomial", exponentiate = TRUE)
+
+result <- tidy(checkup_fit, conf.int=TRUE)
 print(result)
 
 #can i add interaction variables/predictors to this logistic regression model?
+
+# colon_fit <- logistic_reg() %>%
+#   set_engine("glm") %>%
+#   fit(as.factor(colon_n_screened) ~ region + city_size + health_access, 
+#       data=cities, family="binomial", exponentiate = TRUE)
+# result1 <- tidy(colon_fit, conf.int=TRUE)
+# print(result1)
 
 ```
 
