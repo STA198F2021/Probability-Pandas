@@ -79,6 +79,22 @@ cities <- initial_data %>%
          no_mammogram_n_screened = (population - mammogram_n_screened),
          no_pap_n_screened = (population - pap_n_screened))
 
+# checked the residual plot withouth this and need todo this to make model more accurate
+set.seed(100);
+model_west_cities <- sample(cities$city[cities$region == "West"], 25)
+set.seed(100);
+model_midwest_cities <- sample(cities$city[cities$region == "Midwest"], 25)
+set.seed(100);
+model_northeast_cities <- sample(cities$city[cities$region == "Northeast"], 25)
+set.seed(100);
+model_south_cities <- sample(cities$city[cities$region == "South"], 25)
+
+model_cities_names <- c(model_west_cities, model_midwest_cities, 
+                        model_northeast_cities, model_south_cities)
+
+model_cities <- cities %>%
+  filter(city %in% model_cities_names)
+
 west_cities <- cities %>%
   filter(west)
 
@@ -95,6 +111,8 @@ non_continental_cities <- cities %>%
   filter(non_continental)
 
 ``` 
+
+#boxplot of region and city size 
 
 # Introductory Visualisations of Data Set
 
@@ -174,9 +192,20 @@ ggplot(cities, aes(x = region,
 
 checkup_fit <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
                      city_size + health_access, 
-                   family = binomial, data = cities)
+                   family = binomial, data = model_cities)
 summary(checkup_fit)
 
+checkup_fit_aug <-augment(checkup_fit)
+ggplot(checkup_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "blue", lty = "dashed") +
+  labs(title = "Residual Plot", x = "Predicted Value", y = "Residuals")
+
+#predict() VALIDATE DATA , TEST AND TRAINING SET
+#first predict using model , calculate test error/mean square error 
+#line and dot plot graph to compare test set with predicted model 
+
+#can we just do checkup and say that this could be an indicator for general screening
 ```
 
 # checkup_fit <- logistic_reg() %>%
@@ -196,7 +225,7 @@ can i make a regression plot without using augment function?
 
 colon_fit <- glm(cbind(colon_n_screened, no_colon_n_screened) ~ 
                    region + city_size + health_access, 
-    family = binomial, data = cities)
+    family = binomial, data = model_cities)
 summary(colon_fit)
 
 ```
@@ -205,7 +234,7 @@ summary(colon_fit)
 
 mammogram_fit <- glm(cbind(mammogram_n_screened, no_mammogram_n_screened) ~ 
                    region + city_size + health_access, 
-    family = binomial, data = cities)
+    family = binomial, data = model_cities)
 summary(mammogram_fit)
 
 ```
@@ -214,7 +243,7 @@ summary(mammogram_fit)
 
 pap_fit <- glm(cbind(pap_n_screened, no_pap_n_screened) ~ 
                    region + city_size + health_access, 
-    family = binomial, data = cities)
+    family = binomial, data = model_cities)
 summary(pap_fit)
 
 ```
