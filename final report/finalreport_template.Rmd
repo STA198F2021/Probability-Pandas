@@ -113,6 +113,46 @@ south_cities <- cities %>%
 
 # Introductory Visualisations of Data Set
 
+```{r enzo}
+
+cities2 <- cities %>%
+  filter( region != "NA") %>%
+  mutate(logcheckup_n = log(checkup_n))
+
+#boxplots of checkup (n and log) by region
+ggplot(data = cities2,
+       aes(x = region, y = logcheckup_n,
+           color = region)) +
+  geom_boxplot()
+
+#anova shows means of checkup (n and log) are different among the regions
+anova1 <- aov(logcheckup_n ~ region, data = cities2)
+tidy(anova1)
+
+#boxplots of checkup (n and log) by city size
+ggplot(data = cities2,
+       aes(x = city_size, y = logcheckup_n,
+           color = city_size)) +
+  geom_boxplot()
+
+#anova shows means of checkup (n and log) are different among the city sizes
+anova2 <- aov(logcheckup_n ~ city_size, data = cities2)
+tidy(anova2)
+
+#enzo's graph for health access vs checkup
+ggplot(data = cities2,
+       aes(x = health_access, y = logcheckup_n)) +
+  geom_point()
+
+#madeleine's graph for health access vs checkup
+ggplot(cities, aes(x = health_access,
+                   y= checkup))+
+  geom_point()
+
+```
+
+
+
 ```{r Simple-Marginal-Relationship1, warning=FALSE, message=FALSE, echo=FALSE} 
  cities1 <- cities %>%
    na.omit(city_size)
@@ -234,6 +274,16 @@ ggplot(model_cities) +
 #head(cities_heatmap)
 # ggplot(cities, aes(checkup, )) +
   
+
+correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
+                         method = "pearson")
+correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
+                         method = "pearson")
+correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
+                         method = "pearson")
+print(correlation1)
+print(correlation2)
+print(correlation3)
 
 ```
 
