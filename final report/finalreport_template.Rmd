@@ -56,8 +56,7 @@ cities <- initial_data %>%
   mutate(region = ifelse(west == TRUE, "West", 
                          ifelse(midwest == TRUE, "Midwest", 
                                 ifelse(northeast == TRUE, "Northeast", 
-                                       ifelse(south == TRUE,  "South", 
-                                              ifelse(non_continental == TRUE, "Non-continental                                                      US", "NA")))))) %>%
+                                       ifelse(south == TRUE,  "South","NA"))))) %>%
   
   mutate(city_size = ifelse(large_metro == TRUE, "Large Metropolitan", 
                          ifelse(metro == TRUE, "Metropolitan", 
@@ -106,9 +105,6 @@ northeast_cities <- cities %>%
 
 south_cities <- cities %>%
   filter(south)
-
-non_continental_cities <- cities %>% 
-  filter(non_continental)
 
 ``` 
 
@@ -165,10 +161,10 @@ ggplot(cities, aes(x = health_access,
 ```
 
 ```{r Simple-Marginal-Relationship5, warning=FALSE, message=FALSE, echo=FALSE}
-# cities2 <- cities %>% 
-#   na.omit(region)
+cities2 <- cities %>%
+  filter( region != "NA")
 #why isn't my na.omit function working 
-ggplot(cities, aes(x = region, 
+ggplot(cities2, aes(x = region, 
                     y = mammogram_n_screened, 
                     fill = region))+
   geom_bar( stat = 'identity' )+ 
@@ -178,6 +174,47 @@ ggplot(cities, aes(x = region,
   theme(axis.text.x = element_text(angle = 45,hjust=1))+
   theme(legend.position = "none")
 #again added fill for some color for funsies 
+```
+
+```{r introvis-checkup6-region}
+cities2 <- cities %>%
+  filter( region != "NA")
+
+ggplot(cities2, aes(x = region, 
+                    y = checkup, 
+                    fill = region))+
+  geom_bar( stat = 'identity' )+ 
+  labs( x = "Region", 
+        y = "Prevalence of checkup",
+        title = "Prevalence of checkups by Region") +
+  theme(axis.text.x = element_text(angle = 45,hjust=1))+
+  theme(legend.position = "none")
+```
+
+```{r introvis-checkup7-citysize}
+cities2 <- cities %>%
+  filter( city_size != "NA")
+
+ggplot(cities2, aes(x = city_size, 
+                    y = checkup, 
+                    fill = city_size))+
+  geom_bar( stat = 'identity' )+ 
+  labs( x = "Region", 
+        y = "Prevalence of checkup",
+        title = "Prevalence of checkups by City Size") +
+  theme(axis.text.x = element_text(angle = 45,hjust=1))+
+  theme(legend.position = "none")
+#doesn't look that helpful tbh won't hurt my feelings if u trash it 
+```
+
+```{r introvis-checkup8-lackHC}
+ggplot(cities, aes(x = health_access,
+                   y= checkup))+
+  geom_point()+ 
+  labs( x = "Lack of Health Care Access", 
+        y = "Prevalence of Checkups",
+        title = "Prevalence of Checkups and Lack of Healthcare Access")
+#cloud of points means something-- don't forget this later on 
 ```
 
 
