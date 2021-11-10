@@ -31,14 +31,14 @@ cities <- initial_data %>%
          COPD_AdjPrev, COLON_SCREEN_AdjPrev,COREM_AdjPrev, COREW_AdjPrev, 
          KIDNEY_AdjPrev, MAMMOUSE_AdjPrev, PAPTEST_AdjPrev) %>%
   rename(state = StateAbbr, city = PlaceName, population = Population2010,
-         health_access = ACCESS2_AdjPrev, cancer = CANCER_AdjPrev, 
+         health_access = ACCESS2_AdjPrev, cancer = CANCER_AdjPrev,
          heart_disease = CHD_AdjPrev, checkup = CHECKUP_AdjPrev,
-         chronic_lung_disease = COPD_AdjPrev, 
+         chronic_lung_disease = COPD_AdjPrev,
          colon_screen = COLON_SCREEN_AdjPrev,
          men_colorectal_cancer_screen = COREM_AdjPrev,
          women_colorectal_cancer_screen = COREW_AdjPrev,
          chronic_kidney_disease = KIDNEY_AdjPrev,
-         mammogram = MAMMOUSE_AdjPrev, 
+         mammogram = MAMMOUSE_AdjPrev,
          pap_test = PAPTEST_AdjPrev) %>%
   mutate(large_metro = (population >= 1500000), 
          metro = (population >= 500000 & population < 1500000), 
