@@ -10,6 +10,9 @@ editor_options:
 
 ```{r load-packages-data, warning=FALSE, message=FALSE, echo=FALSE}
 library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(plyr)
 library(tidymodels)
 library(infer)
 library(readr)
@@ -24,13 +27,15 @@ options(scipen=10000)
 
 usa <- map_data('usa')
 state <- map_data("state")
+```
 
+```{r data-wrangling}
 cities <- initial_data %>%
   select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, 
          ACCESS2_AdjPrev,CANCER_AdjPrev, CHD_AdjPrev, CHECKUP_AdjPrev,
          COPD_AdjPrev, COLON_SCREEN_AdjPrev,COREM_AdjPrev, COREW_AdjPrev, 
          KIDNEY_AdjPrev, MAMMOUSE_AdjPrev, PAPTEST_AdjPrev) %>%
-  rename(state = StateAbbr, city = PlaceName, population = Population2010,
+  dplyr::rename(state = StateAbbr, city = PlaceName, population = Population2010,
          health_access = ACCESS2_AdjPrev, cancer = CANCER_AdjPrev,
          heart_disease = CHD_AdjPrev, checkup = CHECKUP_AdjPrev,
          chronic_lung_disease = COPD_AdjPrev,
@@ -223,8 +228,9 @@ ggplot(model_cities) +
 
 ```{r Heatmap-Checkup-Screenings}
 
-cities_heatmap <- melt(cities, id.vars = "checkup", measure.vars = 
-                         c("colon_screen", "mammogram", "pap_test"))
+# cities_heatmap <- melt(cities, id.vars = "checkup", measure.vars = 
+#                          c("colon_screen", "mammogram", "pap_test"))
+
 #head(cities_heatmap)
 # ggplot(cities, aes(checkup, )) +
   
@@ -302,6 +308,8 @@ model that was made from the training data set compared to the rest of the test 
 
 library(pROC)
 
+# predictions from no interaction model 
+
 test_prob1 = predict(checkup_fit, newdata = cities_test, type = "response")
 print(test_prob1)
 
@@ -311,9 +319,21 @@ new_cities_test <-
 ggplot(cities_test, aes(x = test_prob1, y = checkup)) +
   geom_point()
 
-#calculate r2
+# prediction from model with interaction
+
+test_prob2 = predict(checkup_fit2, newdata = cities_test, type = "response")
+print(test_prob2)
+
+new_cities_test <-
+  merge(cities_test, test_prob2, by = "row.names", all.x = TRUE)
+
+ggplot(cities_test, aes(x = test_prob2, y = checkup)) +
+  geom_point()
+
+#calculate root mean standard error of both models
 
 rmse(new_cities_test, truth = checkup, estimate = test_prob1)
+rmse(new_cities_test, truth = checkup, estimate = test_prob2)
 
 ```
 
