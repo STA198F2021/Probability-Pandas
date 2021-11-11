@@ -142,7 +142,7 @@ tidy(anova2)
 #enzo's graph for health access vs checkup
 ggplot(data = cities2,
        aes(x = health_access, y = logcheckup_n)) +
-  geom_point()
+  geom_col(aes(width = 1))
 
 #madeleine's graph for health access vs checkup
 ggplot(cities, aes(x = health_access,
