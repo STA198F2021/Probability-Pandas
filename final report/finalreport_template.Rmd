@@ -299,7 +299,8 @@ summary(checkup_fit)
 
 #interaction model
 checkup_fit2 <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
-                     city_size + health_access + region*city_size, 
+                     city_size + health_access + region*city_size + 
+                      region*health_access + city_size*health_access, 
                    family = binomial, data = model_cities)
 summary(checkup_fit2)
 
@@ -321,9 +322,6 @@ summary(checkup_fit2)
 # print(result)
 
 #how do i visualize all the log reg models 
-can i augment when using a log reg model that uses cbind?
-can i make a regression plot without using augment function?
-
 
 ```{r Colon_Model, warning=FALSE, message=FALSE, echo=FALSE}
 
@@ -363,27 +361,29 @@ library(pROC)
 test_prob1 = predict(checkup_fit, newdata = cities_test, type = "response")
 print(test_prob1)
 
-new_cities_test <-
+cities_test1 <-
   merge(cities_test, test_prob1, by = "row.names", all.x = TRUE)
 
-ggplot(cities_test, aes(x = test_prob1, y = checkup)) +
-  geom_point()
+ggplot(cities_test1, aes(x = test_prob1, y = checkup)) +
+  geom_point(aes(color = region, size = health_access)) +
+  labs(title = "Predicted Checkup Prevalence (within a year) vs Collected Data",
+       x = "Predicted Checkup Prevalence", y = "Checkup Prevalence")
 
 # prediction from model with interaction
 
 test_prob2 = predict(checkup_fit2, newdata = cities_test, type = "response")
 print(test_prob2)
 
-new_cities_test <-
+cities_test2 <-
   merge(cities_test, test_prob2, by = "row.names", all.x = TRUE)
 
-ggplot(cities_test, aes(x = test_prob2, y = checkup)) +
+ggplot(cities_test2, aes(x = test_prob2, y = checkup)) +
   geom_point()
 
 #calculate root mean standard error of both models
 
-rmse(new_cities_test, truth = checkup, estimate = test_prob1)
-rmse(new_cities_test, truth = checkup, estimate = test_prob2)
+rmse(cities_test1, truth = checkup, estimate = test_prob1)
+rmse(cities_test2, truth = checkup, estimate = test_prob2)
 
 ```
 
