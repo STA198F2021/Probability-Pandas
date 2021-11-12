@@ -380,7 +380,17 @@ cities_test2 <-
 ggplot(cities_test2, aes(x = test_prob2, y = checkup)) +
   geom_point(aes(color = region, size = health_access))
 
-#calculate root mean standard error of both models
+#rmse against model/training data set
+
+test_prob_model = predict(checkup_fit, newdata = model_cities, type = "response")
+model_cities1 <- merge(model_cities, test_prob_model, by = "row.names", all.x = TRUE)
+rmse(model_cities1, truth = checkup, estimate = test_prob_model)
+
+test_prob_model2 = predict(checkup_fit2, newdata = model_cities, type = "response")
+model_cities2 <- merge(model_cities, test_prob_model2, by = "row.names", all.x = TRUE)
+rmse(model_cities2, truth = checkup, estimate = test_prob_model)
+
+#calculate root mean standard error of both models against test data set
 
 rmse(cities_test1, truth = checkup, estimate = test_prob1)
 rmse(cities_test2, truth = checkup, estimate = test_prob2)
