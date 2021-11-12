@@ -352,7 +352,7 @@ summary(pap_fit)
 
 # Model Validation
 model that was made from the training data set compared to the rest of the test data points from the cities data
-```{r Prediction}
+```{r Prediction-enzo show this to prof. herring}
 
 library(pROC)
 
@@ -378,7 +378,7 @@ cities_test2 <-
   merge(cities_test, test_prob2, by = "row.names", all.x = TRUE)
 
 ggplot(cities_test2, aes(x = test_prob2, y = checkup)) +
-  geom_point()
+  geom_point(aes(color = region, size = health_access))
 
 #calculate root mean standard error of both models
 
