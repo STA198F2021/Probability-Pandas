@@ -171,59 +171,13 @@ ggplot(cities1, aes(x = city_size,
 #i kinda hate the y-axis numbers here because they are huge --- added options(scipen=10000) to the first code chunk to make this but i think there's a diff way to get rid of scientific notation that i cannot remember atm 
 ```
 
-```{r Simple-Marginal-Relationship2, warning=FALSE, message=FALSE, echo=FALSE}
-ggplot(cities, aes(x = health_access,
-                   y= colon_screen))+
-  geom_point()+ 
-  labs( x = "Lack of Health Care Access", 
-        y = "Number of People who got a Colon Screening",
-        title = "Number of Checkups by City Size")
-#want to find a way to organize by gender 
-```
-
-```{r Simple-Marginal-Relationship3, warning=FALSE, message=FALSE, echo=FALSE}
-ggplot(cities, aes(x = health_access,
-                   y= men_colorectal_cancer_screen))+
-  geom_point()+ 
-  labs( x = "Lack of Health Care Access", 
-        y = "Men who had a Colorectal Cancer Screening ",
-        title = "Colorectal Cancer Screening and Lack of Healthcare Access",
-        subtitle = "Men only")
-```
-
-```{r Simple-Marginal-Relationship4, warning=FALSE, message=FALSE, echo=FALSE}
-ggplot(cities, aes(x = health_access,
-                   y= women_colorectal_cancer_screen))+
-  geom_point()+ 
-  labs( x = "Lack of Health Care Access", 
-        y = "Women who had a Colorectal Cancer Screening ",
-        title = "Colorectal Cancer Screening and Lack of Healthcare Access",
-        subtitle = "Women only")
-```
-
-```{r Simple-Marginal-Relationship5, warning=FALSE, message=FALSE, echo=FALSE}
-# cities2 <- cities %>%
-#   filter( region != "NA")
-# why isn't my na.omit function working 
-ggplot(cities, aes(x = region, 
-                    y = mammogram_n_screened, 
-                    fill = region))+
-  geom_bar( stat = 'identity' )+ 
-  labs( x = "Region", 
-        y = "Women who had a Mammogram ",
-        title = "Mammograms by Region") +
-  theme(axis.text.x = element_text(angle = 45,hjust=1))+
-  theme(legend.position = "none")
-#again added fill for some color for funsies 
-```
-
 ```{r introvis-checkup6-region}
 cities2 <- cities %>%
   filter( region != "NA")
 
 ggplot(cities2, aes(x = region, 
                     y = checkup, 
-                    color = region))+
+                    fill = region))+
   geom_bar( stat = 'identity' )+ 
   labs( x = "Region", 
         y = "Prevalence of checkup",
@@ -258,15 +212,7 @@ ggplot(cities, aes(x = health_access,
 #cloud of points means something-- don't forget this later on 
 ```
 
-
-```{r Predictor-Variable-Distribution, warning=FALSE, message=FALSE, echo=FALSE}
-#fix this later 
-ggplot(model_cities) +
-  geom_boxplot(aes(region, city_size))
-
-```
-
-```{r Heatmap-Checkup-Screenings}
+```{r correlation-test-Checkup-Screenings}
 
 # cities_heatmap <- melt(cities, id.vars = "checkup", measure.vars = 
 #                          c("colon_screen", "mammogram", "pap_test"))
@@ -303,51 +249,6 @@ checkup_fit2 <- glm(cbind(checkup_n, no_checkup_n) ~ region +
                       region*health_access + city_size*health_access, 
                    family = binomial, data = model_cities)
 summary(checkup_fit2)
-
-
-
-#predict() VALIDATE DATA , TEST AND TRAINING SET
-#first predict using model , calculate test error/mean square error 
-#line and dot plot graph to compare test set with predicted model 
-
-#can we just do checkup and say that this could be an indicator for general screening
-```
-
-# checkup_fit <- logistic_reg() %>%
-#   set_engine("glm") %>%
-#   fit(as.factor(checkup_n) ~ region + city_size + health_access, data=cities, 
-#       family="binomial", exponentiate = TRUE)
-# 
-# result <- tidy(checkup_fit, conf.int=TRUE)
-# print(result)
-
-#how do i visualize all the log reg models 
-
-```{r Colon_Model, warning=FALSE, message=FALSE, echo=FALSE}
-
-colon_fit <- glm(cbind(colon_n_screened, no_colon_n_screened) ~ 
-                   region + city_size + health_access, 
-    family = binomial, data = model_cities)
-summary(colon_fit)
-
-```
-
-```{r Mammogram_Model, warning=FALSE, message=FALSE, echo=FALSE}
-
-mammogram_fit <- glm(cbind(mammogram_n_screened, no_mammogram_n_screened) ~ 
-                   region + city_size + health_access, 
-    family = binomial, data = model_cities)
-summary(mammogram_fit)
-
-```
-
-```{r Pap_Model, warning=FALSE, message=FALSE, echo=FALSE}
-
-pap_fit <- glm(cbind(pap_n_screened, no_pap_n_screened) ~ 
-                   region + city_size + health_access, 
-    family = binomial, data = model_cities)
-summary(pap_fit)
-
 ```
 
 # Model Validation
@@ -364,11 +265,6 @@ print(test_prob1)
 cities_test1 <-
   merge(cities_test, test_prob1, by = "row.names", all.x = TRUE)
 
-ggplot(cities_test1, aes(x = test_prob1, y = checkup)) +
-  geom_point(aes(color = region, size = health_access)) +
-  labs(title = "Predicted Checkup Prevalence (within a year) vs Collected Data",
-       x = "Predicted Checkup Prevalence", y = "Checkup Prevalence")
-
 # prediction from model with interaction
 
 test_prob2 = predict(checkup_fit2, newdata = cities_test, type = "response")
@@ -377,23 +273,20 @@ print(test_prob2)
 cities_test2 <-
   merge(cities_test, test_prob2, by = "row.names", all.x = TRUE)
 
-ggplot(cities_test2, aes(x = test_prob2, y = checkup)) +
-  geom_point(aes(color = region, size = health_access))
-
 #rmse against model/training data set
 
 test_prob_model = predict(checkup_fit, newdata = model_cities, type = "response")
 model_cities1 <- merge(model_cities, test_prob_model, by = "row.names", all.x = TRUE)
-rmse(model_cities1, truth = checkup, estimate = test_prob_model)
+rmse(model_cities1, truth = (checkup/100), estimate = test_prob_model)
 
 test_prob_model2 = predict(checkup_fit2, newdata = model_cities, type = "response")
 model_cities2 <- merge(model_cities, test_prob_model2, by = "row.names", all.x = TRUE)
-rmse(model_cities2, truth = checkup, estimate = test_prob_model)
+rmse(model_cities2, truth = (checkup/100), estimate = test_prob_model)
 
 #calculate root mean standard error of both models against test data set
 
-rmse(cities_test1, truth = checkup, estimate = test_prob1)
-rmse(cities_test2, truth = checkup, estimate = test_prob2)
+rmse(cities_test1, truth = (checkup/100), estimate = test_prob1)
+rmse(cities_test2, truth = (checkup/100), estimate = test_prob2)
 
 ```
 
