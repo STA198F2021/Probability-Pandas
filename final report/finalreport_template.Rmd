@@ -115,31 +115,55 @@ south_cities <- cities %>%
 
 ```{r enzo}
 
+#showing strong correlation between checkup and the other three outcome variables - paptest, colon screen, and mammogram
+correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
+                         method = "pearson")
+correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
+                         method = "pearson")
+correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
+                         method = "pearson")
+print(correlation1)
+print(correlation2)
+print(correlation3)
+
+#wrangling for visualizations
 cities2 <- cities %>%
   filter( region != "NA") %>%
   mutate(logcheckup_n = log(checkup_n))
 
-#boxplots of checkup (n and log) by region
+#(1) boxplots of checkup (n and log) by region
 ggplot(data = cities2,
        aes(x = region, y = logcheckup_n,
            color = region)) +
   geom_boxplot()
 
-#anova shows means of checkup (n and log) are different among the regions
+#(2) histograms showing mean checkup (not that well), faceted by region
+cities2 %>%
+ggplot(aes(x = logcheckup_n)) +
+  facet_wrap(~region) +
+  geom_histogram()
+
+#(3) anova shows means of checkup (n and log) are different among the regions
 anova1 <- aov(logcheckup_n ~ region, data = cities2)
 tidy(anova1)
 
-#boxplots of checkup (n and log) by city size
+#(4) boxplots of checkup (n and log) by city size
 ggplot(data = cities2,
        aes(x = city_size, y = logcheckup_n,
            color = city_size)) +
   geom_boxplot()
 
-#anova shows means of checkup (n and log) are different among the city sizes
+#(5) histograms showing mean checkup, faceted by region
+cities2 %>%
+ggplot(aes(x = logcheckup_n)) +
+  facet_wrap(~city_size) +
+  geom_histogram()
+
+#(6) anova shows means of checkup (n and log) are different among the city sizes
 anova2 <- aov(logcheckup_n ~ city_size, data = cities2)
 tidy(anova2)
 
-#enzo's graph for health access vs checkup
+#(7) enzo's graph for health access vs checkup
 ggplot(data = cities2,
        aes(x = health_access, y = logcheckup_n)) +
   geom_col(aes(width = 1))
@@ -214,6 +238,8 @@ ggplot(cities, aes(x = health_access,
 
 ```{r correlation-test-Checkup-Screenings}
 
+#WE PROBABLY DON'T NEEED THIS CHUNK ANYMORE I MOVED THE CORRELATION TEST TO THE BEGINNING PART
+
 # cities_heatmap <- melt(cities, id.vars = "checkup", measure.vars = 
 #                          c("colon_screen", "mammogram", "pap_test"))
 
@@ -221,15 +247,15 @@ ggplot(cities, aes(x = health_access,
 # ggplot(cities, aes(checkup, )) +
   
 
-correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
-                         method = "pearson")
-correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
-                         method = "pearson")
-correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
-                         method = "pearson")
-print(correlation1)
-print(correlation2)
-print(correlation3)
+#correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
+#                         method = "pearson")
+#correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
+#                         method = "pearson")
+#correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
+#                         method = "pearson")
+#print(correlation1)
+#print(correlation2)
+#print(correlation3)
 
 ```
 
