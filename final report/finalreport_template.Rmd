@@ -151,7 +151,7 @@ ggplot(data = cities2,
            color = city_size)) +
   geom_boxplot()
 
-#(5) histograms showing mean checkup, faceted by region
+#(5) histograms showing mean checkup, faceted by city size
 cities2 %>%
 ggplot(aes(x = logcheckup_n)) +
   facet_wrap(~city_size) +
