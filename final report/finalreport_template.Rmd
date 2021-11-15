@@ -21,8 +21,12 @@ library(sf)
 library(plotly)
 library(tab)
 library(pROC)
-library(lemon)
-initial_data <- read_csv("data/500_Cities.csv")
+library(sjPlot)
+library(sjlabelled)
+library(sjmisc)
+library(kableExtra)
+library(gtsummary)
+initial_data <- read_csv("../data/500_Cities.csv")
 options(scipen=10000)
 
 usa <- map_data('usa')
@@ -111,7 +115,7 @@ south_cities <- cities %>%
 
 # Introductory Visualisations of Data Set
 
-```{r Intro Visualiszations}
+```{r Intro-Visualiszations}
 
 #showing strong correlation between checkup and the other three outcome variables - paptest, colon screen, and mammogram
 correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
@@ -217,33 +221,30 @@ ggplot(cities, aes(x = health_access,
 
 # Models
 
-```{r Multiple Logistic Regression Model, warning=FALSE, message=FALSE, echo=FALSE}
+```{r Multiple-Logistic-Regression-Model, warning=FALSE, message=FALSE, echo=FALSE}
 
 checkup_fit <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
                      city_size + health_access, 
                    family = binomial, data = model_cities)
-tabglm(checkup_fit, columns = list("or", "p"),
-       xvarlabels = list(region = "Region (Refrence = Midwest)", 
-                         city_size = "City Size (Refrence = Large Metropolitan)",
-                         health_access = "Health Access"),
-                         factor.compression = 2)
+
+checkup_fit_df1 <- tidy(checkup_fit, exponentiate = TRUE, intercept = TRUE)
+checkup_fit_df1_f <- checkup_fit_df1[, -c(3, 4)]
+kable(checkup_fit_df1_f)
 
 #interaction model
-checkup_fit2 <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
-                     city_size + health_access + region*city_size + 
-                      region*health_access + city_size*health_access, 
+checkup_fit2 <- glm(cbind(checkup_n, no_checkup_n) ~ region +
+                     city_size + health_access + region*city_size +
+                      region*health_access + city_size*health_access,
                    family = binomial, data = model_cities)
-tabglm(checkup_fit2, columns = list("or", "p"),
-       xvarlabels = list(region = "Region (Refrence = Midwest)", 
-                         city_size = "City Size (Refrence = Large Metropolitan)",
-                         health_access = "Health Access"),
-                         factor.compression = 2)
+
+checkup_fit_df2 <- tidy(checkup_fit2, exponentiate = TRUE, intercept = TRUE)
+checkup_fit_df2_f <- checkup_fit_df2[, -c(3, 4)]
+kable(checkup_fit_df2_f)
 ```
 
 # Model Validation
-model that was made from the training data set compared to the rest of the test data points from the cities data
-```{r model validation, render=lemon_print}
 
+```{r model-validation}
 # predictions from no interaction model 
 
 test_prob1 = predict(checkup_fit, newdata = cities_test, type = "response")
@@ -273,8 +274,10 @@ rmse(model_cities2, truth = (checkup/100), estimate = test_prob_model)
 rmse1 <- rmse(cities_test1, truth = (checkup/100), estimate = test_prob1)
 rmse2 <- rmse(cities_test2, truth = (checkup/100), estimate = test_prob2)
 
-print(rmse1)
-print(rmse2)
-#how to use the lemon thing?
-```
+rmse1 %>%
+  kable()
 
+rmse2 %>%
+  kable()
+
+```
