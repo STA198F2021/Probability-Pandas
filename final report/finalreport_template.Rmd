@@ -115,6 +115,19 @@ south_cities <- cities %>%
 
 # Introductory Visualisations of Data Set
 
+```{r trying to make a table}
+correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
+                         method = "pearson")
+
+tidy.cor3 <- tidy(correlation3)
+tidy.cor3.final <- tidy.cor3[,-c(2,4,7,8)]
+
+kable(tidy.cor3.final)
+
+# kable.tidy.cor3 <- kable(tidy.cor3)
+# remove_column(kable.tidy.cor3, c(2,4,7,8))
+```
+
 ```{r Intro-Visualiszations}
 
 #showing strong correlation between checkup and the other three outcome variables - paptest, colon screen, and mammogram
