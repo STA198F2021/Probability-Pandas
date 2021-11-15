@@ -22,7 +22,7 @@ library(plotly)
 library(tab)
 library(pROC)
 library(lemon)
-initial_data <- read_csv("../data/500_Cities.csv")
+initial_data <- read_csv("data/500_Cities.csv")
 options(scipen=10000)
 
 usa <- map_data('usa')
@@ -178,12 +178,11 @@ ggplot(cities, aes(x = health_access,
    na.omit(city_size)
 
 ggplot(cities1, aes(x = city_size, 
-                   y = checkup_n, 
-                   fill = city_size))+ 
+                   y = checkup_n))+ 
   geom_bar( stat = 'identity')+ 
   labs( x = "City Size", 
-        y = "People who got a Checkup",
-        title = "Number of Checkups by City Size") +
+        y = "Checkups per Capita",
+        title = "Prevalence of Checkups by City Size") +
   theme(axis.text.x = element_text(angle = 45,hjust=1))+ 
   theme(legend.position = "none")
 ```
@@ -203,30 +202,17 @@ ggplot(cities2, aes(x = region,
   theme(legend.position = "none")
 ```
 
-```{r introvis-checkup7-citysize}
-cities2 <- cities %>%
-  filter( city_size != "NA")
-
-ggplot(cities2, aes(x = city_size, 
-                    y = checkup, 
-                    color = city_size))+
-  geom_bar( stat = 'identity' )+ 
-  labs( x = "Region", 
-        y = "Prevalence of checkup",
-        title = "Prevalence of checkups by City Size") +
-  theme(axis.text.x = element_text(angle = 45,hjust=1))+
-  theme(legend.position = "none")
-#doesn't look that helpful tbh won't hurt my feelings if u trash it 
-```
 
 ```{r introvis-checkup8-lackHC}
 ggplot(cities, aes(x = health_access,
-                   y= checkup))+
+                   y= checkup,
+                   color = city_size))+
   geom_point()+ 
   labs( x = "Lack of Health Care Access", 
-        y = "Prevalence of Checkups",
+        y = "Checkups Count",
         title = "Prevalence of Checkups and Lack of Healthcare Access")
 #cloud of points means something-- don't forget this later on 
+#gross 
 ```
 
 # Models
