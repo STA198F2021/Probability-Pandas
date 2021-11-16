@@ -271,7 +271,6 @@ ggplot(cities, aes(x = health_access,
 checkup_fit <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
                      city_size + health_access, 
                    family = binomial, data = model_cities)
-
 checkup_fit_df1 <- tidy(checkup_fit, exponentiate = TRUE, intercept = TRUE) %>%
   rename(Variable = term, Estimate = estimate, "P-Value" = p.value) %>%
   mutate(Variable = c("Intercept", "Northeast", "South", "West",
