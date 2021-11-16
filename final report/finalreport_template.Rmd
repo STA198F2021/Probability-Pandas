@@ -33,8 +33,6 @@ library(knitr)
 initial_data <- read_csv("../data/500_Cities.csv")
 options(scipen=10000)
 
-usa <- map_data('usa')
-state <- map_data("state")
 ```
 
 ```{r data-wrangling, warning=FALSE, message=FALSE, echo=FALSE}
@@ -121,7 +119,7 @@ We have analyzed the 500 Cities Project: 2016 - 2019, collectd by the Centers of
 In this database, the CDC provides information about the 500 largest cities in the United
 States. There are 500 observations in this dataset, each correlating to one unique city. Some of the prominent variables in this dataset include crude and adjusted rates of the lack of access to insurance, prevalence of various chronic illnesses, prevalence of routine doctor visits, and prevalence of chronic illness tests/screenings. The chronic illnesses include, but are not limited to, cancer, coronary heart disease, obstructive pulmonary disease, and kidney disease. 
 
-It includes variables such as lack of healthcare access, prevalence of checkups, and prevalence of various chronic diseases as well as various screening tests. The lack of healthcare access is a key variable as we will use this variable to observe how it affects the numbers of screenings. Having a low percentage of the lack of healthcare variable would indicate that a city has high access to healthcare and inversely, having a high percentage of the lack of healthcare variable would indicate that a city has little access to healthcare. 
+It includes variables such as prevalence of lack of health insurance, prevalence of checkups, and prevalence of various chronic diseases as well as various screening tests. The prevalence of lack of health insurance is a key variable as we will use this variable to observe how it affects the numbers of screenings. Having a low value of the lack of health insurance variable would indicate that a city has high prevalence of health insurance among its citizens and inversely, having a high value of the lack of health insurance variable would indicate that a city has low prevalence of health insurance among its citizens.
 
 Receiving screening for various chronic diseases can reduce mortality rates for those diseases. For example, the American Cancer society conducted a study to observe the effects of mammogram screenings on the prevalence of advanced and fatal breast cancers. The study found that women who received breast cancer screening had a statistically significant 41% reduction in their risk of having a fatal breast cancer case and a 25% reduction in the rates of advanced breast cancer. This study suggests that receiving a screening can decrease the likelihood of having a fatal or worsened case of breast cancer. Furthermore, a different study examined the mortality of colorectal cancer patients based on whether or not they had received a colonoscopy. The study concluded that those who received a colonoscopy had lower rates of experiencing death due to colon cancer than those who did not receive a colonoscopy. A similar study also concluded that fecal occult blood testing reduced colorectal cancer rates by 16%. Another 2014 study examined a 28% risk reduction in colorectal cancer mortality due to sigmoidoscopy screening. One 2007 study recorded the decline in cervical cancer due to the implementation of a papanicolaou test screening program. These various studies suggest that screening for various chronic diseases may effectively reduce mortality rates for each disease. 
 
@@ -130,15 +128,15 @@ How does health insurance correlate to the prevalence of screening for various c
 
 | The goal of this report is to analyze how health insurance affects people’s access to chronic disease screening. We hypothesized that decreased lack of health insurance is correlated to increased screening for chronic diseases in various cities. Inversely, we also hypothesized that increased lack of health insurance prevalence is correlated to decreased screening for chronic diseases in various cities. 
 
-Null Hypothesis: The lack of health insurance has no effect on the number of chronic disease screenings in various cities. 
+Null Hypothesis: The prevalence of lack of health insurance has no effect on the number of chronic disease screenings in various cities. 
 
-Alternative Hypothesis:  The lack of health insurance has an effect on the number of chronic disease screenings in various cities. 
+Alternative Hypothesis:  The prevalence of lack of health insurance has an effect on the number of chronic disease screenings in various cities. 
 
 # Data Wrangling
 
-We first selected to only use the columns in the dataset indicating state, city name, population, lack of access to health care, different prevalence of chronic diseases and screening for chronic diseases. After renaming them accordingly we categorized each city into regions: West, Midwest, North, and South through the definitions given by the US Census. We also categorized them by city size: large metropolitan, if they had a population of 1.5 million or more, metropolitan if their population was between 500,000 and 1.5 million, medium-size urban, if their population was between 200,000 and 500,000, and small urban, if their population was between 50,000 and 200,000. We also omitted any cities that did not fit into any region or city size categories. These sizing categories were given by the OECD. Then we created two new columns that calculated the number of individuals in each city who got an annual checkup and the number of individuals who did not get an annual checkup. Lastly, to create a model we split the entire data set into two sets, ¾ of the set becoming the training data being used for creating the model and ¼ of the data being set aside to test the model against. 
+We first selected to only use the columns in the dataset indicating state, city name, population, prevalence of lack of health insurance, different prevalence of chronic diseases and screening for chronic diseases. After renaming them accordingly we categorized each city into regions: West, Midwest, North, and South through the definitions given by the US Census. We also categorized them by city size: large metropolitan, if they had a population of 1.5 million or more, metropolitan if their population was between 500,000 and 1.5 million, medium-size urban, if their population was between 200,000 and 500,000, and small urban, if their population was between 50,000 and 200,000. We also omitted any cities that did not fit into any region or city size categories. These sizing categories were given by the OECD. Then we created two new columns that calculated the number of individuals in each city who got an annual checkup and the number of individuals who did not get an annual checkup. Lastly, to create a model we split the entire data set into two sets, ¾ of the set becoming the training data being used for creating the model and ¼ of the data being set aside to test the model against. 
 
-# Introductory Visualisations of Data Set
+# Exploratory Data Analysis
 
 ```{r correlation-table, warning=FALSE, message=FALSE, echo=FALSE}
 correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
@@ -172,6 +170,8 @@ kable(tidy.cor3.final, caption = "Pearson's Correlation Test: Mammograms and Che
   kable_styling(latex_options = "HOLD_position")
 ```
 
+We have 4 outcome variables: amount of checkups per capita, amount of mammograms per capita, amopunt of pap tests per capita, and amount of colon screenings per capita. First we conducted Pearson’s Correlation Test, which is a simple test of the linear correlation between two groups of data. A correlation coefficient equal to 1 shows the strongest possible positive correlation, while a correlation coefficient equal to -1 shows the strongest possible negative correlation. We conducted Pearson’s Correlation Test to show the relationships between checkups and mammograms, pap tests, and colon screenings, individually. The tests yielded the following correlation coefficients and p-values. (insert prints of correlations here). While the p-values were rounded to 0 in the output table, their actual values were all less than 2.2x10^-16. These show very strong linear relationships between checkups and mammograms, pap tests, and colon screenings. This allows us to conduct an in-depth analysis of the relationships of our predictor variables, region, city size, and health insurance, to a singular output variable, checkups, and extrapolate our results to apply very similarly to the other output variables, mammograms, pap tests, and colon screenings. 
+
 ```{r Intro-Visualiszations, warning=FALSE, message=FALSE, echo=FALSE}
 #wrangling for visualizations
 cities2 <- cities %>%
@@ -193,6 +193,8 @@ plot1 <- ggplot(data = cities2,
 
 ```
 
+Following are visualizations to show the rough relationship between the amount of checkups per capita and region. The boxplots show the ranges of values of the amounts of checkups (on the log scale) for each region. The medians, interquartile ranges, and ranges of values for the four regions look to be somewhat different, but are still similar. It is difficult to draw any inferences from this visualization, especially regarding the mean.
+
 ```{r Simple-Marginal-Relationship2, warning=FALSE, message=FALSE, echo=FALSE}
 #(2) histograms showing mean checkup (not that well), faceted by region
 plot2 <- cities2 %>%
@@ -203,6 +205,8 @@ ggplot(aes(x = logcheckup_n)) +
        y = "Count",
        title = "Checkups by Region")
 ```
+
+The next visualizations are histograms of amount of checkups (log scale), faceted by region. Again, it is very difficult to draw any meaningful inferences from these graphs. The curves look to have peaks at somewhat different values, but they still look to be similar.
 
 ```{r arrangeing-plot1/2, warning=FALSE, message=FALSE, echo=FALSE}
 
@@ -222,6 +226,8 @@ kable(tidy.anova1.final, caption = "ANOVA: Checkups per capita (log scale), by R
   kable_styling(latex_options = "HOLD_position")
 ```
 
+An ANOVA will yield a definitive result for whether there are differences in the means of the amounts of checkups among the regions. The ANOVA test yields a p-value of 0.006384 (less than alpha=0.05), meaning that there are indeed significant differences among the four regions.
+
 ```{r Simple-Marginal-Relationship4, warning=FALSE, message=FALSE, echo=FALSE}
 #(4) boxplots of checkup (n and log) by city size
 plot3 <- ggplot(data = cities2,
@@ -234,6 +240,7 @@ plot3 <- ggplot(data = cities2,
   theme(axis.text.x = element_text(angle = 45,hjust=1), legend.position = "none")
 ```
 
+Following are visualizatioons to show the rough relationships between the amount of checkups per capita and city size. The box plots show the ranges of the amount of checkups (on the log scale) for each city size. This box plot is much more helpful than the last. The medians, interquartile ranges, and ranges are very different among the four city sizes. This allows us to infer that the means of the amounts ofcheckups (on the log scale) are different among the city size categories.
 
 ```{r Simple-Marginal-Relationship5, warning=FALSE, message=FALSE, echo=FALSE}
 #(5) histograms showing mean checkup, faceted by city size
@@ -245,6 +252,8 @@ ggplot(aes(x = logcheckup_n)) +
        y = "Count",
        title = "Checkups by City Size")
 ```
+
+The histograms of amount of checkups (log scale), faceted by city size, also show that the ranges and probable means of log checkups are likely very different among the four categories of city sizes.
 
 ```{r arrangeing-plot4/3, warning=FALSE, message=FALSE, echo=FALSE}
 
@@ -261,17 +270,23 @@ tidy.anova2.final <- tidy.anova2[,-c(2,3,4)]
 kable(tidy.anova2.final, caption = "ANOVA: Checkups per capita (log scale), by Region") %>%
       row_spec(0, bold = T) %>%
   kable_styling(latex_options = "HOLD_position")
+
 ```
 
-```{r introvis-checkup8-lackHC, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(6,4)}
-ggplot(cities, aes(x = health_access,
-                   y= checkup))+
+An ANOVA test proves that the means of the amounts of checkups (log scale) are different among the four city size categories. The ANOVA test yields a p-value of 4.15x10^-165 (less than alpha=0.05), which was rounded to 0 in the output table. This means that there are indeed significant differences among the four regions.
+
+```{r introvis-checkup8-lackHI, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(6,4)}
+#(7)
+ggplot(cities2, aes(x = health_access,
+                   y= logcheckup_n))+
   geom_point()+ 
-  labs( x = "Lack of Health Care Access", 
-        y = "Checkups Count",
-        title = "Prevalence of Checkups and Lack of Healthcare Access")
+  labs( x = "Prevalence of Lack of Health Insurance", 
+        y = "Checkups per capita (log scale)",
+        title = "Prevalence of Checkups and Lack of Health Insurance")
 
 ```
+
+This plot shows the cities as data points, plotted according to their value for prevalence of lack of health insurance on the x-axis and their amount of checkups per capita (on the log scale) on the y axis. The plot does not offer much in the way of drawing inferences. It looks as if the highest values for amount of checkups are from cities with greater amounts of health insurance, but this is not a very strong inference to draw in terms of showing the effect of health insurance on the amount of checkups. A regression model is needed to show whether prevalence of health insurance in a city does or does not have an effect on the amount of checkups per capita.
 
 # Models
 
@@ -285,7 +300,7 @@ checkup_fit_df1 <- tidy(checkup_fit, exponentiate = TRUE, intercept = TRUE) %>%
   rename(Variable = term, Estimate = estimate, "P-Value" = p.value) %>%
   mutate(Variable = c("Intercept", "Northeast", "South", "West",
                                   "Medium-Size Urban", "Metropolitan",
-                                  "Small-Size Urban", "HC"))
+                                  "Small-Size Urban", "HI"))
 checkup_fit_df1_f <- checkup_fit_df1[, -c(3, 4)]
 
 #model 2: with interaction
@@ -298,15 +313,15 @@ checkup_fit_df2 <- tidy(checkup_fit2, exponentiate = TRUE, intercept = TRUE) %>%
   rename(Variable = term, Estimate = estimate, "P-Value" = p.value) %>%
   mutate(Variable = c("Intercept", "Northeast", "South", "West",
                       "Medium-Size Urban", "Metropolitan", "Small-Size Urban", 
-                      "HC", "Northeast by Medium-Size Urban", 
+                      "HI", "Northeast by Medium-Size Urban", 
                       "South by Medium-Size Urban", 
                       "West by Medium-Size Urban", "Northeast by Metropolitan", 
                       "South by Metropolitan", "West by Metropolitan", 
                       "Northeast by Small-Size Urban", 
                       "South by Small-Size Urban", "West by Small-Size Urban", 
-                      "Northeast by HC", "South by HC", "West by HC", 
-                      "Medium-Size Urban by HC", "Metropolitan by HC", 
-                      "Small-Size Urban by HC"))
+                      "Northeast by HI", "South by HI", "West by HI", 
+                      "Medium-Size Urban by HI", "Metropolitan by HI", 
+                      "Small-Size Urban by HI"))
 checkup_fit_df2_f <- checkup_fit_df2[, -c(3, 4)]
 
 ```
@@ -331,7 +346,7 @@ checkup_fit_df2_f %>%
 
 ```
 
-From the introductory exploration of the 500 cities dataset we decided to create two different multiple logistic regression models that represent the effect of multiple predictors on the outcome of prevalence of checkups in a city. A logistic regression model was chosen because we wanted to model the binary outcome of whether or not individuals in a certain city were getting checkups or not. The first model includes the predictor variables region, city size, and prevalence of lack of access to health care (HC). The second model included all the predictor variables from the first model, as well as their interactions with one another, ie. region and city size, region and HC, and city size and HC. 
+From the introductory exploration of the 500 cities dataset we decided to create two different multiple logistic regression models that represent the effect of multiple predictors on the outcome of prevalence of checkups in a city. A logistic regression model was chosen because we wanted to model the binary outcome of whether or not individuals in a certain city were getting checkups or not. The first model includes the predictor variables region, city size, and prevalence of lack of health insurance (HI). The second model included all the predictor variables from the first model, as well as their interactions with one another, ie. region and city size, region and HI, and city size and HI. 
 
 # Model Validation
 
@@ -426,12 +441,11 @@ Due to the fact that the statistical significance of the predictors from both lo
 
 # Results
 
-Based on the conclusion from the RMSE, we will only be analyzing the outcomes and estimates from Model 1. In Model 1, we found all of the predictor variables and their levels to be statistically significant because their p-values were well below 0.05. The referent in this model is a large-metropolitan city in the Midwest with an HC value of 0. The model also indicates that when all other variables are held constant, the the odds of getting a checkup decrease the most, relative to the referent group, when in the Western region of the US. Meaning any individual living in cities in the West coast of the US are less likely to get annual checkups. The model also shows a slight decrease in the odds of getting a checkup when a city is either Metropolitan or Small-Size Urban, relative to the referent group. In terms of HC, when the prevalence of lack of access to health care increases, the amount of checkups in that city decreases. Therefore, if there were increased access to health care across any type of city, there would be an increase in the amount of checkups in that city. However, although the significance of the predictor is high, the impact of HC on the model odds of getting a checkup are low relative to the other predictors in the model. Cities in the Northeast are shown in the model to have the higher checkups compared to the rest of the groups, including the referent. 	
+Based on the conclusion from the RMSE, we will only be analyzing the outcomes and estimates from Model 1. In Model 1, we found all of the predictor variables and their levels to be statistically significant because their p-values were well below 0.05. The referent in this model is a large-metropolitan city in the Midwest with an HI value of 0. The model also indicates that when all other variables are held constant, the the odds of getting a checkup decrease the most, relative to the referent group, when in the Western region of the US. Meaning any individual living in cities in the West coast of the US are less likely to get annual checkups. The model also shows a slight decrease in the odds of getting a checkup when a city is either Metropolitan or Small-Size Urban, relative to the referent group. In terms of HI, when the prevalence of lack of access to health care increases, the amount of checkups in that city decreases. Therefore, if there were increased access to health care across any type of city, there would be an increase in the amount of checkups in that city. 
 
 # Discussion
+	In summary, people in medium-size urban cities in the Northeast or South are much more likely to get annual checkups than those in the referent group. While those in metropolitan or small-size urban cities in the West are less likely to get annual checkups that those in the referent group. But, as access to health care increases the likelihood individuals are to get a checkup increases, independent of which specific city they live in. Although the significance of the predictor is high, the impact of HI on the model odds of getting a checkup are low relative to the other predictors in the model. Cities in the Northeast are shown in the model to have the higher checkups compared to the rest of the groups, including the referent. The amount of checkups per capita was shown to be extremely closely correlated individually to each of the amount of pap tests per capita, the amount of colon screenings per capita, and the amount of mammograms per capita. This supports our initial hypothesis that decreased lack of access to health insurance prevalence is correlated to increased screening for chronic diseases in various cities. 
 
-In summary, people in medium-size urban cities in the Northeast or South are much more likely to get annual checkups than those in the referent group. While those in metropolitan or small-size urban cities in the West are less likely to get annual checkups that those in the referent group. Although, as access to health care increases the likelihood individuals are to get a checkup increases, independent of which specific city they live in. 
+## Limitations
 
-Due to the fact that HC does not have a very significant impact on the model, if we added another data set including other possible predictors for checkups we could have added better predictors to our model. We can see evidence for this in the high RMSE of the model against the training set. This dataset is also limited to the 500 largest cities in the US and is not representative of the entire US. However, we can make generalizations about the impact of region, city size, and HC on checkups and other chronic illness screenings. ______ 
-
-Based on our findings we would suggest further research on why cities in the West are less likely to have checkups. This could be stemming from data that is not part of the dataset that we were analyzing or there could be possible policies and infrastructure that prohibits individuals living in large western cities in the US from getting checkups, increasing the likelihood then to get screenings for chronic diseases and receiving preventative treatments.  _______ 
+## Potential Implications
