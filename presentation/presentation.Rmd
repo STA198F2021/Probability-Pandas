@@ -1,6 +1,6 @@
 ---
-title: "Health Care Access and Screening for Chronic Illnesses"
-subtitle: "500 Cities Dataset"
+title: "Health Insurance and Screening for Chronic Illnesses"
+subtitle: "500 Cities Project"
 author: "Probability Pandas"
 institute: "Duke University"
 date: "`r Sys.Date()`"
@@ -18,11 +18,29 @@ output:
 ```{r load-packages, include = FALSE}
 # Add any additional packages you need to this chunk
 # Remove any packages from this list that you're not using
-library(tidyverse)
-library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(plyr)
+library(tidymodels)
+library(infer)
+library(readr)
+library(ggplot2)
+library(sf)
+library(plotly)
+library(tab)
+library(pROC)
+library(sjPlot)
+library(sjlabelled)
+library(sjmisc)
+library(kableExtra)
+library(gtsummary)
+library(repr)
+library(gridExtra)
+library(xtable)
 ```
 
 ```{r setup, include=FALSE}
@@ -37,19 +55,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r load-data, include=FALSE}
-library(tidyverse)
-library(tidyr)
-library(dplyr)
-library(plyr)
-library(tidymodels)
-library(infer)
-library(readr)
-library(ggplot2)
-library(maps)
-library(mapdata)
-library(sf)
-library(plotly)
-library(reshape)
 initial_data <- read_csv("../data/500_Cities.csv")
 options(scipen=10000)
 ```
@@ -59,6 +64,102 @@ style_xaringan(
   title_slide_background_image = "img/watercolour_sys02_img34_teacup-ocean.jpg"
 )
 ```
+
+class: inverse, middle, center
+
+# 500 Cities Project Database
+
+---
+
+## Background: Screening for Chronic Disease
+
+---
+
+## Research Question
+
+---
+
+## Hypothesis
+
+---
+
+class: inverse, middle, center
+
+# Data Wrangling
+
+---
+
+## New Variables
+
+---
+
+class: inverse, middle, center
+
+# Exploratory Data Analysis
+
+---
+
+## Correlation Between Checkups and Screening for Chronic Diseases
+
+---
+
+## Checkups by Region
+
+---
+
+## Checkups by City Size
+
+---
+
+class: inverse, middle, center
+
+# Modeling
+
+---
+
+## Multiple Logistic Regression Model
+
+---
+
+## Model 1
+
+---
+
+## Model 2
+
+---
+
+class: inverse, middle, center
+
+# Model Validation
+
+---
+
+## RMSE Against Training Set
+
+---
+
+## RMSE Against Test Set
+
+---
+
+## Results
+
+---
+
+## Discussion
+
+---
+
+## Limitations
+
+---
+
+## Potential Implications
+
+
+
+---
 
 class: inverse, middle, center
 
