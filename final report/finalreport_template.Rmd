@@ -93,7 +93,6 @@ cities <- initial_data %>%
          no_mammogram_n_screened = (population - mammogram_n_screened),
          no_pap_n_screened = (population - pap_n_screened))
 
-# checked the residual plot withouth this and need todo this to make model more accurate
 #this is the training data set called model_cities
 set.seed(100)
 
@@ -116,6 +115,9 @@ south_cities <- cities %>%
   filter(south)
 
 ``` 
+# Introduction
+
+# Data Wrangling
 
 # Introductory Visualisations of Data Set
 
