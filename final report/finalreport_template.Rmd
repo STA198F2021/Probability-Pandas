@@ -170,41 +170,13 @@ tidy.cor3.final <- tidy.cor3[,-c(2,4,7,8)]
 kable(tidy.cor3.final, caption = "Pearson's Correlation Test: Mammograms and Checkups") %>%
     row_spec(0, bold = T) %>%
   kable_styling(latex_options = "HOLD_position")
-
-#add better labels for this table and create a table title
-
-# kable.tidy.cor3 <- kable(tidy.cor3)
-# remove_column(kable.tidy.cor3, c(2,4,7,8))
 ```
 
 ```{r Intro-Visualiszations, warning=FALSE, message=FALSE, echo=FALSE}
-
-#showing strong correlation between checkup and the other three outcome variables - paptest, colon screen, and mammogram
-#correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
-#                         method = "pearson")
-#correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
-#                         method = "pearson")
-#correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
-#                         method = "pearson")
-# print(correlation1)
-# print(correlation2)
-# print(correlation3)
-
 #wrangling for visualizations
 cities2 <- cities %>%
   filter( region != "NA") %>%
   mutate(logcheckup_n = log(checkup_n))
-
-#(3) anova shows means of checkup (n and log) are different among the regions
-#anova1 <- aov(logcheckup_n ~ region, data = cities2)
-#tidy(anova1)
-
-#(6) anova shows means of checkup (n and log) are different among the city sizes
-#anova2 <- aov(logcheckup_n ~ city_size, data = cities2)
-#tidy(anova2)
-
-#please make these nicer tables
-
 ```
 
 ```{r Simple-Marginal-Relationship1, warning=FALSE, message=FALSE, echo=FALSE}
@@ -289,53 +261,6 @@ tidy.anova2.final <- tidy.anova2[,-c(2,3,4)]
 kable(tidy.anova2.final, caption = "ANOVA: Checkups per capita (log scale), by Region") %>%
       row_spec(0, bold = T) %>%
   kable_styling(latex_options = "HOLD_position")
-```
-
-```{r Simple-Marginal-Relationship7, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(4,4)}
-#(7) enzo's graph for health access vs checkup
-# ggplot(data = cities2,
-#        aes(x = health_access, y = logcheckup_n)) +
-#   geom_col(aes(width = 1))
-```
-
-```{r Simple-Marginal-Relationship8, warning=FALSE, message=FALSE, echo=FALSE}
-#madeleine's graph for health access vs checkup
-# plot1 <- ggplot(cities, aes(x = health_access,
-#                    y= checkup))+
-#   geom_point()
-```
-
-
-```{r Simple-Marginal-Relationship9, warning=FALSE, message=FALSE, echo=FALSE} 
-#  cities1 <- cities %>%
-#    na.omit(city_size)
-# 
-# plot2 <- ggplot(cities1, aes(x = city_size, 
-#                    y = checkup_n))+ 
-#   geom_bar(stat = 'identity')+ 
-#   labs( x = "City Size", 
-#         y = "Checkups per Capita",
-#         title = "Prevalence of Checkups by City Size") +
-#   theme(axis.text.x = element_text(angle = 45,hjust=1))+ 
-#   theme(legend.position = "none")
-# 
-# grid.arrange(plot1, plot2, ncol = 2)
-
-```
-
-```{r introvis-checkup6-region, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(4,4)}
-#cities2 <- cities %>%
-#  filter( region != "NA")
-# 
-# ggplot(cities2, aes(x = region, 
-#                     y = checkup, 
-#                     fill = region))+
-#   geom_bar( stat = 'identity' )+ 
-#   labs( x = "Region", 
-#         y = "Prevalence of checkup",
-#         title = "Prevalence of checkups by Region") +
-#   theme(axis.text.x = element_text(angle = 45,hjust=1))+
-#   theme(legend.position = "none")
 ```
 
 ```{r introvis-checkup8-lackHC, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(6,4)}
