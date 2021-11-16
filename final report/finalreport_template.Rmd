@@ -207,7 +207,7 @@ ggplot(data = cities2,
   geom_col(aes(width = 1))
 ```
 
-```{r Simple-Marginal-Relationship8, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(4,4)}
+```{r Simple-Marginal-Relationship8, warning=FALSE, message=FALSE, echo=FALSE}
 #madeleine's graph for health access vs checkup
 plot1 <- ggplot(cities, aes(x = health_access,
                    y= checkup))+
@@ -215,7 +215,7 @@ plot1 <- ggplot(cities, aes(x = health_access,
 ```
 
 
-```{r Simple-Marginal-Relationship9, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(4,4)} 
+```{r Simple-Marginal-Relationship9, warning=FALSE, message=FALSE, echo=FALSE} 
  cities1 <- cities %>%
    na.omit(city_size)
 
