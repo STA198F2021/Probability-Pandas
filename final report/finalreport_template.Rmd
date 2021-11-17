@@ -174,7 +174,7 @@ kable(tidy.cor3.final, caption = "Pearson's Correlation Test: Mammograms and Che
   kable_styling(latex_options = "HOLD_position")
 ```
 
-We have 4 outcome variables: amount of checkups per capita, amount of mammograms per capita, amopunt of pap tests per capita, and amount of colon screenings per capita. First we conducted Pearson’s Correlation Test, which is a simple test of the linear correlation between two groups of data. A correlation coefficient equal to 1 shows the strongest possible positive correlation, while a correlation coefficient equal to -1 shows the strongest possible negative correlation. We conducted Pearson’s Correlation Test to show the relationships between checkups and mammograms, pap tests, and colon screenings, individually. The tests yielded the following correlation coefficients and p-values. (insert prints of correlations here). While the p-values were rounded to 0 in the output table, their actual values were all less than 2.2x10^-16. These show very strong linear relationships between checkups and mammograms, pap tests, and colon screenings. This allows us to conduct an in-depth analysis of the relationships of our predictor variables, region, city size, and health insurance, to a singular output variable, checkups, and extrapolate our results to apply very similarly to the other output variables, mammograms, pap tests, and colon screenings. 
+We have 4 outcome variables: amount of checkups per capita, amount of mammograms per capita, amount of pap tests per capita, and amount of colon screenings per capita. First we conducted Pearson’s Correlation Test, which is a simple test of the linear correlation between two groups of data. A correlation coefficient equal to 1 shows the strongest possible positive correlation, while a correlation coefficient equal to -1 shows the strongest possible negative correlation. We conducted Pearson’s Correlation Test to show the relationships between checkups and mammograms, pap tests, and colon screenings, individually. The tests yielded the following correlation coefficients and p-values. While the p-values were rounded to 0 in the output table, their actual values were all less than $$2.2*10^{-16}$$. These show very strong linear relationships between checkups and mammograms, pap tests, and colon screenings. This allows us to conduct an in-depth analysis of the relationships of our predictor variables, region, city size, and health insurance, to a singular output variable, checkups, and extrapolate our results to apply very similarly to the other output variables, mammograms, pap tests, and colon screenings. 
 
 ```{r Intro-Visualiszations, warning=FALSE, message=FALSE, echo=FALSE}
 #wrangling for visualizations
@@ -197,7 +197,7 @@ plot1 <- ggplot(data = cities2,
 
 ```
 
-Following are visualizations to show the rough relationship between the amount of checkups per capita and region. The boxplots show the ranges of values of the amounts of checkups (on the log scale) for each region. The medians, interquartile ranges, and ranges of values for the four regions look to be somewhat different, but are still similar. It is difficult to draw any inferences from this visualization, especially regarding the mean.
+Following are visualizations to show the rough relationship between the amount of checkups per capita and region. The box plots show the ranges of values of the amounts of checkups (on the log scale) for each region. The medians, interquartile ranges, and ranges of values for the four regions look to be somewhat different, but are still similar. It is difficult to draw any inferences from this visualization, especially regarding the mean.
 
 ```{r Simple-Marginal-Relationship2, warning=FALSE, message=FALSE, echo=FALSE}
 #(2) histograms showing mean checkup (not that well), faceted by region
@@ -277,7 +277,7 @@ kable(tidy.anova2.final, caption = "ANOVA: Checkups per capita (log scale), by R
 
 ```
 
-An ANOVA test proves that the means of the amounts of checkups (log scale) are different among the four city size categories. The ANOVA test yields a p-value of 4.15x10^-165 (less than alpha=0.05), which was rounded to 0 in the output table. This means that there are indeed significant differences among the four regions.
+An ANOVA test proves that the means of the amounts of checkups (log scale) are different among the four city size categories. The ANOVA test yields a p-value of 4.15x10^-165^ (less than alpha=0.05), which was rounded to 0 in the output table. This means that there are indeed significant differences among the four regions.
 
 ```{r introvis-checkup8-lackHI, warning=FALSE, message=FALSE, echo=FALSE, fig.dim= c(6,4)}
 #(7)
