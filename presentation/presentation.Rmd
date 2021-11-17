@@ -375,31 +375,6 @@ $$\beta_{2}*Region*HealthInsurance + \beta_{3}CitySize*HealthInsurance$$
 
 ---
 
-## Model 1
-```{r model1-table, echo=FALSE}
-
-checkup_fit_df1_f %>%
-  kable(caption = "Model 1: Without Interaction") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  row_spec(0, bold = T) %>%
-  kable_styling(latex_options = "HOLD_position")
-
-```
----
-
-## Model 2
-```{r model2-table, echo=FALSE}
-
-checkup_fit_df2_f %>%
-  kable(caption = "Model 2: With Interaction") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  row_spec(0, bold = T) %>%
-  kable_styling(latex_options = "HOLD_position")
-
-```
-
----
-
 class: inverse, middle, center
 
 # Model Validation
