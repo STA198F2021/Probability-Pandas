@@ -210,16 +210,76 @@ class: inverse, middle, center
 ---
 
 ## Multiple Logistic Regression Model
+```{r Multiple-Logistic-Regression-Model, echo=FALSE, warning=FALSE, message=FALSE}
+
+#model 1: withouth interaction
+checkup_fit <- glm(cbind(checkup_n, no_checkup_n) ~ region + 
+                     city_size + health_access, 
+                   family = binomial, data = model_cities)
+checkup_fit_df1 <- tidy(checkup_fit, exponentiate = TRUE, intercept = TRUE) %>%
+  rename(Variable = term, Estimate = estimate, "P-Value" = p.value) %>%
+  mutate(Variable = c("Intercept", "Northeast", "South", "West",
+                                  "Medium-Size Urban", "Metropolitan",
+                                  "Small-Size Urban", "HI"))
+checkup_fit_df1_f <- checkup_fit_df1[, -c(3, 4)]
+
+#model 2: with interaction
+checkup_fit2 <- glm(cbind(checkup_n, no_checkup_n) ~ region +
+                     city_size + health_access + region*city_size +
+                      region*health_access + city_size*health_access,
+                   family = binomial, data = model_cities) 
+
+checkup_fit_df2 <- tidy(checkup_fit2, exponentiate = TRUE, intercept = TRUE) %>%
+  rename(Variable = term, Estimate = estimate, "P-Value" = p.value) %>%
+  mutate(Variable = c("Intercept", "Northeast", "South", "West",
+                      "Medium-Size Urban", "Metropolitan", "Small-Size Urban", 
+                      "HI", "Northeast by Medium-Size Urban", 
+                      "South by Medium-Size Urban", 
+                      "West by Medium-Size Urban", "Northeast by Metropolitan", 
+                      "South by Metropolitan", "West by Metropolitan", 
+                      "Northeast by Small-Size Urban", 
+                      "South by Small-Size Urban", "West by Small-Size Urban", 
+                      "Northeast by HI", "South by HI", "West by HI", 
+                      "Medium-Size Urban by HI", "Metropolitan by HI", 
+                      "Small-Size Urban by HI"))
+checkup_fit_df2_f <- checkup_fit_df2[c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
+                                       12, 13, 14), -c(3, 4)]
+
+```
 
 We created a Logistic Regression Model because we wanted to model the binary outcome of whether or not individuals in a certain city were getting checkups or not. 
+
+Model 1: Without Interaction
+$$log(\frac{\pi_{i}}{\pi-1})=\beta_{0} + \beta_{1}*Region + \beta_{2}*CitySize + \beta_{3}HealthInsurance$$
+Model 2: With Interaction
+$$log(\frac{\pi_{i}}{\pi-1})=\beta_{0} + \beta_{1}*Region + \beta_{2}*CitySize + \beta_{3}HealthInsurance + \beta_{1}*Region*CitySize +$$
+
+$$\beta_{2}*Region*HealthInsurance + \beta_{3}CitySize*HealthInsurance$$
 
 ---
 
 ## Model 1
+```{r model1-table, echo=FALSE}
 
+checkup_fit_df1_f %>%
+  kable(caption = "Model 1: Without Interaction") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
 ---
 
 ## Model 2
+```{r model2-table, echo=FALSE}
+
+checkup_fit_df2_f %>%
+  kable(caption = "Model 2: With Interaction") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
 
 ---
 
@@ -227,19 +287,121 @@ class: inverse, middle, center
 
 # Model Validation
 
+```{r model-validation, echo=FALSE, warning=FALSE, message=FALSE}
+# predictions from no interaction model 
+test_prob1 = predict(checkup_fit, newdata = cities_test, type = "response")
+
+cities_test1 <-
+  merge(cities_test, test_prob1, by = "row.names", all.x = TRUE)
+
+# prediction from model with interaction
+test_prob2 = predict(checkup_fit2, newdata = cities_test, type = "response")
+
+cities_test2 <-
+  merge(cities_test, test_prob2, by = "row.names", all.x = TRUE)
+
+```
+
 ---
 
 ## RMSE Against Training Set
+
+```{r rmse-training, echo=FALSE, warning=FALSE, message=FALSE}
+#rmse against model/training data set
+
+#model 1
+test_prob_model = predict(checkup_fit, newdata = model_cities, type = "response")
+model_cities1 <- merge(model_cities, test_prob_model, by = "row.names", all.x = TRUE)
+
+rmse1 <- rmse(model_cities1, truth = (checkup/100), estimate = test_prob_model) %>%
+  rename("RMSE" = .metric, "Estimate" = .estimate)
+rmse1_f <- rmse1[, c(1, 3)]
+
+#model 2
+test_prob_model2 = predict(checkup_fit2, newdata = model_cities, type = "response")
+model_cities2 <- merge(model_cities, test_prob_model2, by = "row.names", all.x = TRUE)
+
+rmse2 <- rmse(model_cities2, truth = (checkup/100), estimate = test_prob_model)%>%
+  rename("RMSE" = .metric, "Estimate" = .estimate)
+rmse2_f <- rmse2[, c(1, 3)]
+
+```
+
+.pull-left[
+```{r rmse-table1, echo=FALSE, warning=FALSE, message=FALSE}
+
+rmse1_f %>%
+  kable(caption = "RMSE of Model 1 Against Traning Dataset")%>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
+]
+
+.pull-right[
+```{r rmse-table2, echo=FALSE, warning=FALSE, message=FALSE}
+
+rmse2_f %>%
+  kable(caption = "RMSE of Model 2 Against Traning Dataset") %>%
+  kable_classic(full_width = F, html_font = "Cambria")%>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
+]
 
 ---
 
 ## RMSE Against Test Set
 
+```{r rmse-test, echo=FALSE, warning=FALSE, message=FALSE}
+#calculate root mean standard error of both models against test data set
+
+#model 1
+rmse3 <- rmse(cities_test1, truth = (checkup/100), estimate = test_prob1) %>%
+  rename("RMSE" = .metric, "Estimate" = .estimate)
+rmse3_f <- rmse3[, c(1, 3)]
+
+#model 2
+rmse4 <- rmse(cities_test2, truth = (checkup/100), estimate = test_prob2) %>%
+  rename("RMSE" = .metric, "Estimate" = .estimate)
+rmse4_f <- rmse4[, c(1, 3)]
+```
+
+.pull-left[
+```{r rmse-table3, echo=FALSE, warning=FALSE, message=FALSE}
+
+rmse3_f %>%
+  kable(caption = "RMSE of Model 1 Against Test Dataset")%>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
+]
+
+.pull-right[
+```{r rmse-table4, echo=FALSE, warning=FALSE, message=FALSE}
+
+rmse4_f %>%
+  kable(caption = "RMSE of Model 2 Against Test Dataset")%>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
+]
 ---
 
 ## Results
 
-- table
+```{r model1-table-again, echo=FALSE}
+
+checkup_fit_df1_f %>%
+  kable(caption = "Model 1: Without Interaction") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
 
 ---
 
