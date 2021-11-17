@@ -57,6 +57,82 @@ knitr::opts_chunk$set(
 ```{r load-data, include=FALSE}
 initial_data <- read_csv("../data/500_Cities.csv")
 options(scipen=10000)
+
+cities <- initial_data %>%
+  select(StateAbbr, PlaceName, Population2010, PlaceFIPS, Geolocation, 
+         ACCESS2_AdjPrev,CANCER_AdjPrev, CHD_AdjPrev, CHECKUP_AdjPrev,
+         COPD_AdjPrev, COLON_SCREEN_AdjPrev,COREM_AdjPrev, COREW_AdjPrev, 
+         KIDNEY_AdjPrev, MAMMOUSE_AdjPrev, PAPTEST_AdjPrev) %>%
+  dplyr::rename(state = StateAbbr, city = PlaceName, population = Population2010,
+         health_access = ACCESS2_AdjPrev, cancer = CANCER_AdjPrev,
+         heart_disease = CHD_AdjPrev, checkup = CHECKUP_AdjPrev,
+         chronic_lung_disease = COPD_AdjPrev,
+         colon_screen = COLON_SCREEN_AdjPrev,
+         men_colorectal_cancer_screen = COREM_AdjPrev,
+         women_colorectal_cancer_screen = COREW_AdjPrev,
+         chronic_kidney_disease = KIDNEY_AdjPrev,
+         mammogram = MAMMOUSE_AdjPrev,
+         pap_test = PAPTEST_AdjPrev) %>%
+  mutate(large_metro = (population >= 1500000), 
+         metro = (population >= 500000 & population < 1500000), 
+         med_urban = (population >= 200000 & population < 500000), 
+         small_urban = (population >= 50000 & population < 200000)) %>%
+  mutate(west = (state %in% c("WA", "OR", "ID", "MT", "WY", "CA", "NV", "UT", 
+                              "CO", "AZ", "NM")), 
+         midwest = (state %in% c("ND", "SD", "NE", "KS", "MN", "IA", "MO", 
+                                 "WI", "IL", "IN", "MI", "OH")),
+         northeast = (state %in% c("PA", "NY", "VT", "NH", "MA", "CT", "RI", 
+                                   "NJ", "ME", "DC")), 
+         south = (state %in% c("OK", "TX", "AR", "LA", "MS", "AL", "TN", "KY", 
+                               "WV", "VA", "MD", "DE", "NC", "SC", "GA", 
+                               "FL"))) %>%
+  mutate(region = ifelse(west == TRUE, "West", 
+                         ifelse(midwest == TRUE, "Midwest", 
+                                ifelse(northeast == TRUE, "Northeast", 
+                                       ifelse(south == TRUE,  
+                                              "South", NA))))) %>%
+  mutate(city_size = ifelse(large_metro == TRUE, "Large Metropolitan", 
+                         ifelse(metro == TRUE, "Metropolitan", 
+                                ifelse(med_urban == TRUE, "Medium-Size Urban", 
+                                       ifelse(small_urban == TRUE, 
+                                              "Small-Size Urban", NA))))) %>%
+  na.omit(city_size) %>%
+  na.omit(region) %>%
+  mutate(checkup_n = (population*(checkup/100)), 
+         colon_n_screened = (population*(colon_screen/100)), 
+         m_colorectal_n_screened = (population*(men_colorectal_cancer_screen/100)),
+         w_colorectal_n_screened = 
+           (population*(women_colorectal_cancer_screen/100)),
+         mammogram_n_screened = (population*(mammogram/100)),
+         pap_n_screened = (population*(pap_test/100))) %>%
+  mutate(no_checkup_n = (population - checkup_n), 
+         no_colon_n_screened = (population - colon_n_screened), 
+         no_m_colorectal_n_screened = (population - m_colorectal_n_screened),
+         no_w_colorectal_n_screened = 
+           (population - w_colorectal_n_screened),
+         no_mammogram_n_screened = (population - mammogram_n_screened),
+         no_pap_n_screened = (population - pap_n_screened))
+
+#this is the training data set called model_cities
+set.seed(100)
+
+split <- initial_split(cities, prop = 3/4, strata = region)
+
+model_cities <- training(split)
+cities_test <- testing(split)
+
+#for introductory visualizations
+west_cities <- cities %>%
+  filter(west)
+
+midwest_cities <- cities %>%
+  filter(midwest)
+
+northeast_cities <- cities %>%
+  filter(northeast)
+
+south_cities <- cities %>%
+  filter(south)
 ```
 
 ```{r style-slides, echo = FALSE}
@@ -73,13 +149,25 @@ class: inverse, middle, center
 
 ## Background: Screening for Chronic Disease
 
+We found several studies revealing that obtaining a screening test for breast cancer, colorectal cancer, colon cancer, and cervical cancer would reduce a patient's risk of mortality by his or her chronic disease. For example, the American Cancer society conducted a study to observe the effects of mammogram screenings on the prevalence of advanced and fatal breast cancers. The study found that women who received breast cancer screening had a statistically significant 41% reduction in their risk of having a fatal breast cancer case and a 25% reduction in the rates of having advanced breast cancer.^[citation] This study suggests that receiving a screening can decrease the likelihood of having a fatal or worsened case of breast cancer.
+
+- The goal of this report is to analyze how lack of access to health insurance affects people’s access to chronic disease screening. 
+
 ---
 
 ## Research Question
 
+How does lack of access to health insurance correlate to the prevalence of screening for various chronic diseases?
+
 ---
 
 ## Hypothesis
+
+Our hypothesis is that decreased lack of access to health insurance prevalence is correlated to increased screening for chronic diseases in various cities. Inversely, we also hypothesize that increased lack of access to health insurance prevalence is correlated to decreased screening for chronic diseases in various cities.
+
+- Null Hypothesis: The lack of health insurance has no effect on the number of chronic disease screenings in various cities.
+
+- Alternate Hypothesis:  The lack of health insurance has an effect on the number of chronic disease screenings in various cities.
 
 ---
 
@@ -90,6 +178,10 @@ class: inverse, middle, center
 ---
 
 ## New Variables
+
+- Region
+- City Size
+- Number of Individuals Getting Specific Screening
 
 ---
 
@@ -119,6 +211,8 @@ class: inverse, middle, center
 
 ## Multiple Logistic Regression Model
 
+We created a Logistic Regression Model because we wanted to model the binary outcome of whether or not individuals in a certain city were getting checkups or not. 
+
 ---
 
 ## Model 1
@@ -145,13 +239,23 @@ class: inverse, middle, center
 
 ## Results
 
+- table
+
 ---
 
 ## Discussion
 
+- Impact of Different Regions on Predicted Checkups
+- Impact of Different City Sizes on Predicted Checkups
+- Impact of HI on Predicted Checkups
+
 ---
 
 ## Limitations
+
+- Unequal number of cities for each city size
+- Data set only includes 500 largest cities in the US
+- Other significant predictors that are not included in this particlar dataset
 
 ---
 
