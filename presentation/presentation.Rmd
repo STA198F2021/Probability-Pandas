@@ -251,20 +251,6 @@ ggplot(data = cities2,
 ---
 
 ## Checkups by Region
-
-```{r checkups-by-region1-again, echo = FALSE, warning = FALSE, message = FALSE}
-cities2 %>%
-ggplot(aes(x = logcheckup_n)) +
-  facet_wrap(~region) +
-  geom_histogram() +
-  labs(x = "Checkups per capita (log scale)",
-       y = "Count",
-       title = "Checkups by Region")
-```
-
----
-
-## Checkups by Region
 ```{r anova, echo = FALSE, warning = FALSE, message = FALSE}
 anova1 <- aov(logcheckup_n ~ region, data = cities2)
 tidy.anova1 <- tidy(anova1) %>%
@@ -288,20 +274,6 @@ ggplot(data = cities2,
        y = "Checkups per capita (log scale)",
        title = "Checkups by City Size") +
   theme(axis.text.x = element_text(angle = 45,hjust=1), legend.position = "none")
-```
-
----
-
-## Checkups by City Size
-```{r Simple-Marginal-Relationship5, warning=FALSE, message=FALSE, echo=FALSE}
-#(5) histograms showing mean checkup, faceted by city size
-cities2 %>%
-ggplot(aes(x = logcheckup_n)) +
-  facet_wrap(~city_size) +
-  geom_histogram() +
-  labs(x = "Checkups per capita (log scale)",
-       y = "Count",
-       title = "Checkups by City Size")
 ```
 
 ---
