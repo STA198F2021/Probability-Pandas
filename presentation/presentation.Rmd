@@ -18,7 +18,6 @@ output:
 ```{r load-packages, include = FALSE}
 # Add any additional packages you need to this chunk
 # Remove any packages from this list that you're not using
-library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
 library(tidyverse)
@@ -133,6 +132,12 @@ northeast_cities <- cities %>%
 
 south_cities <- cities %>%
   filter(south)
+
+
+#wrangling for visualizations
+cities2 <- cities %>%
+  filter( region != "NA") %>%
+  mutate(logcheckup_n = log(checkup_n))
 ```
 
 ```{r style-slides, echo = FALSE}
@@ -179,8 +184,12 @@ class: inverse, middle, center
 
 ## New Variables
 
-- Region
-- City Size
+- Regions: West, Midwest, North, and South
+- City Sizes
+   Large Metropolitan: population of 1.5 million or more, 
+   Metropolitan: population between 500,000-1.5 million,          
+   Medium-Size Urban: population was between 200,000-500,000,  
+   Small Urban: population between 50,000-200,000
 - Number of Individuals Getting Specific Screening
 
 ---
@@ -193,16 +202,124 @@ class: inverse, middle, center
 
 ## Correlation Between Checkups and Screening for Chronic Diseases
 
+```{r correlation-table, warning=FALSE, message=FALSE, echo=FALSE}
+correlation1 <- cor.test(cities$checkup_n, cities$pap_n_screened,
+                         method = "pearson")
+tidy.cor1 <- tidy(correlation1) %>%
+  rename("Correlation Coefficient Estimate" = estimate, "P-Value" = p.value, 
+         "CI Low" = conf.low, "CI High" = conf.high)
+tidy.cor1.final <- tidy.cor1[,-c(2,4,7,8)]
+kable(tidy.cor1.final, caption = "Pearson's Correlation Test: Pap Tests and Checkups") %>%
+    row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+correlation2 <- cor.test(cities$checkup_n, cities$colon_n_screened,
+                         method = "pearson")
+tidy.cor2 <- tidy(correlation2) %>%
+  rename("Correlation Coefficient Estimate" = estimate, "P-Value" = p.value, 
+         "CI Low" = conf.low, "CI High" = conf.high)
+tidy.cor2.final <- tidy.cor2[,-c(2,4,7,8)]
+kable(tidy.cor2.final, caption = "Pearson's Correlation Test: Colon Screenings and Checkups") %>%
+    row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+correlation3 <- cor.test(cities$checkup_n, cities$mammogram_n_screened,
+                         method = "pearson")
+tidy.cor3 <- tidy(correlation3) %>%
+    rename("Correlation Coefficient Estimate" = estimate, "P-Value" = p.value, 
+         "CI Low" = conf.low, "CI High" = conf.high)
+tidy.cor3.final <- tidy.cor3[,-c(2,4,7,8)]
+kable(tidy.cor3.final, caption = "Pearson's Correlation Test: Mammograms and Checkups") %>%
+    row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+```
+
+---
+
+## Checkups by Region
+```{r checkups-by-region1, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = cities2,
+       aes(x = region, y = logcheckup_n,
+           color = region)) +
+  geom_boxplot() +
+  labs(x = "Region",
+       y = "Checkups per capita (log scale)",
+       title = "Checkups by Region") +
+  theme(axis.text.x = element_text(angle = 45,hjust=1), legend.position = "none")
+```
+
 ---
 
 ## Checkups by Region
 
+```{r checkups-by-region1-again, echo = FALSE, warning = FALSE, message = FALSE}
+cities2 %>%
+ggplot(aes(x = logcheckup_n)) +
+  facet_wrap(~region) +
+  geom_histogram() +
+  labs(x = "Checkups per capita (log scale)",
+       y = "Count",
+       title = "Checkups by Region")
+```
+
+---
+
+## Checkups by Region
+```{r anova, echo = FALSE, warning = FALSE, message = FALSE}
+anova1 <- aov(logcheckup_n ~ region, data = cities2)
+tidy.anova1 <- tidy(anova1) %>%
+      rename("Term" = term, "Statistic" = statistic, "P-Value" = p.value)
+tidy.anova1.final <- tidy.anova1[-c(2),-c(2,3,4)]
+kable(tidy.anova1.final, caption = "ANOVA: Checkups per capita (log scale), by Region") %>%
+      row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+```
+
 ---
 
 ## Checkups by City Size
+```{r Simple-Marginal-Relationship4, warning=FALSE, message=FALSE, echo=FALSE}
+#(4) boxplots of checkup (n and log) by city size
+ggplot(data = cities2,
+       aes(x = city_size, y = logcheckup_n,
+           color = city_size)) +
+  geom_boxplot() +
+  labs(x = "City Size",
+       y = "Checkups per capita (log scale)",
+       title = "Checkups by City Size") +
+  theme(axis.text.x = element_text(angle = 45,hjust=1), legend.position = "none")
+```
 
 ---
 
+## Checkups by City Size
+```{r Simple-Marginal-Relationship5, warning=FALSE, message=FALSE, echo=FALSE}
+#(5) histograms showing mean checkup, faceted by city size
+cities2 %>%
+ggplot(aes(x = logcheckup_n)) +
+  facet_wrap(~city_size) +
+  geom_histogram() +
+  labs(x = "Checkups per capita (log scale)",
+       y = "Count",
+       title = "Checkups by City Size")
+```
+
+---
+
+## Checkups by City Size
+```{r anova2, warning=FALSE, message=FALSE, echo=FALSE}
+#(6) anova shows means of checkup (n and log) are different among the city sizes
+anova2 <- aov(logcheckup_n ~ city_size, data = cities2)
+tidy.anova2 <- tidy(anova2) %>%
+        rename("Term" = term, "Statistic" = statistic, "P-Value" = p.value)
+tidy.anova2.final <- tidy.anova2[,-c(2,3,4)]
+kable(tidy.anova2.final, caption = "ANOVA: Checkups per capita (log scale), by Region") %>%
+      row_spec(0, bold = T) %>%
+  kable_styling(latex_options = "HOLD_position")
+
+```
+
+---
 class: inverse, middle, center
 
 # Modeling
@@ -417,166 +534,15 @@ checkup_fit_df1_f %>%
 
 - Unequal number of cities for each city size
 - Data set only includes 500 largest cities in the US
-- Other significant predictors that are not included in this particlar dataset
+- Other significant predictors that are not included in this particular dataset
 
 ---
 
 ## Potential Implications
 
-
-
----
-
-class: inverse, middle, center
-
-# Using xaringan
+- Suggestions for further research: Why are cities in the West less likely to have a high prevalence of checkups?
+- Results of the model as it pertains to prevalence of lack of health insurance: Increased prevalence of health insurance is correlated to greater amount of checkups per capita, and therefore to increased prevalence of screening for various diseases.
+- Mortality: Studies show link from increased screening to decreased mortality.
+- Lowered mortality rates may be achieved with greater prevalence of health insurance.
 
 ---
-
-## xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
-
---
-
-- Like this
-
----
-
-## Layouts
-
-You can use plain text
-
-- or bullet points
-
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-## Code
-
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
-```
-
----
-
-## Plots
-
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-penguins_modified <- penguins %>%
-  mutate(species = fct_other(species, keep = "Adelie"))
-```
-
-```{r plot-penguins, echo = FALSE, warning = FALSE, fig.alt = "Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins."}
-# Code hidden with echo = FALSE
-# Uses modified penguins dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(penguins_modified, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
-  geom_point() + 
-  theme_minimal()
-```
-
----
-
-## Plot and text
-
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
-  theme_minimal()
-```
-]
-
----
-
-class: inverse, middle, center
-
-# A new section...
-
----
-
-## Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r penguins-table, echo = FALSE}
-kable(head(penguins), format = "html")
-```
-
----
-
-## Images
-
-```{r castle, echo = FALSE, out.width = "40%", fig.align = "center", fig.cap = "Image credit: Danielle Navarro, Percolate."}
-include_graphics("img/watercolour_sys02_img32_percolate.jpg")
-```
-
-Or you can also include a full page image. See next slide.
-
----
-
-background-image: url(img/watercolour_sys02_img32_percolate.jpg)
-
----
-
-## Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-class: inverse, middle, center
-
-# Wrap up
-
----
-
-## Feeling adventurous?
-
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
-
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect the majority of you will do. You will differentiate yourself with the content of your presentation.
-
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
-
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.

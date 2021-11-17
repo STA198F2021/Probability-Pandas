@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Health Care Access and Screening for Chronic Illnesses</title>
+    <title>Health Insurance and Screening for Chronic Illnesses</title>
     <meta charset="utf-8" />
     <meta name="author" content="Probability Pandas" />
-    <meta name="date" content="2021-11-11" />
+    <meta name="date" content="2021-11-16" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Health Care Access and Screening for Chronic Illnesses
-## 500 Cities Dataset
+# Health Insurance and Screening for Chronic Illnesses
+## 500 Cities Project
 ### Probability Pandas
 ### Duke University
-### 2021-11-11
+### 2021-11-16
 
 ---
 
@@ -31,233 +33,517 @@ class: center, middle, inverse, title-slide
 
 class: inverse, middle, center
 
-# Using xaringan
+# 500 Cities Project Database
 
 ---
 
-## xaringan
+## Background: Screening for Chronic Disease
 
-- The presentation is created using the `xaringan` package
+We found several studies revealing that obtaining a screening test for breast cancer, colorectal cancer, colon cancer, and cervical cancer would reduce a patient's risk of mortality by his or her chronic disease. For example, the American Cancer society conducted a study to observe the effects of mammogram screenings on the prevalence of advanced and fatal breast cancers. The study found that women who received breast cancer screening had a statistically significant 41% reduction in their risk of having a fatal breast cancer case and a 25% reduction in the rates of having advanced breast cancer.^[citation] This study suggests that receiving a screening can decrease the likelihood of having a fatal or worsened case of breast cancer.
 
-- Use `---` to separate slides and `--` for incremental builds
-
---
-
-- Like this
+- The goal of this report is to analyze how lack of access to health insurance affects people’s access to chronic disease screening. 
 
 ---
 
-## Layouts
+## Research Question
 
-You can use plain text
-
-- or bullet points
-
-.pull-left[
-or text in two columns `\(^*\)`
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
+How does lack of access to health insurance correlate to the prevalence of screening for various chronic diseases?
 
 ---
 
-## Code
+## Hypothesis
 
+Our hypothesis is that decreased lack of access to health insurance prevalence is correlated to increased screening for chronic diseases in various cities. Inversely, we also hypothesize that increased lack of access to health insurance prevalence is correlated to decreased screening for chronic diseases in various cities.
 
-```r
-# a boring regression
-model &lt;- lm(dist ~ speed, data = cars)
-tidy(model)
-```
+- Null Hypothesis: The lack of health insurance has no effect on the number of chronic disease screenings in various cities.
 
-```
-## # A tibble: 2 × 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)   -17.6      6.76      -2.60 1.23e- 2
-## 2 speed           3.93     0.416      9.46 1.49e-12
-```
-
-```r
-glance(model)
-```
-
-```
-## # A tibble: 1 × 12
-##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     0.651         0.644  15.4      89.6 1.49e-12     1  -207.  419.  425.
-## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;
-```
-
----
-
-## Plots
-
-
-
-&lt;img src="presentation_files/figure-html/plot-penguins-1.png" title="Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins." alt="Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins." width="70%" /&gt;
-
----
-
-## Plot and text
-
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="100%" /&gt;
-]
+- Alternate Hypothesis:  The lack of health insurance has an effect on the number of chronic disease screenings in various cities.
 
 ---
 
 class: inverse, middle, center
 
-# A new section...
+# Data Wrangling
 
 ---
 
-## Tables
+## New Variables
 
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+- Regions: West, Midwest, North, and South
+- City Sizes
+   Large Metropolitan: population of 1.5 million or more, 
+   Metropolitan: population between 500,000-1.5 million,          
+   Medium-Size Urban: population was between 200,000-500,000,  
+   Small Urban: population between 50,000-200,000
+- Number of Individuals Getting Specific Screening
 
-&lt;table&gt;
+---
+
+class: inverse, middle, center
+
+# Exploratory Data Analysis
+
+---
+
+## Correlation Between Checkups and Screening for Chronic Diseases
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Pearson's Correlation Test: Pap Tests and Checkups&lt;/caption&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; bill_length_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; flipper_length_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Correlation Coefficient Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI Low &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI High &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9979726 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9975606 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9983151 &lt;/td&gt;
   &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Pearson's Correlation Test: Colon Screenings and Checkups&lt;/caption&gt;
+ &lt;thead&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Correlation Coefficient Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI Low &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI High &lt;/th&gt;
   &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9974287 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9969063 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9978629 &lt;/td&gt;
   &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Pearson's Correlation Test: Mammograms and Checkups&lt;/caption&gt;
+ &lt;thead&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Correlation Coefficient Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI Low &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; CI High &lt;/th&gt;
   &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9988299 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.998592 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9990276 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
 ---
 
-## Images
-
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="img/watercolour_sys02_img32_percolate.jpg" alt="Image credit: Danielle Navarro, Percolate." width="40%" /&gt;
-&lt;p class="caption"&gt;Image credit: Danielle Navarro, Percolate.&lt;/p&gt;
-&lt;/div&gt;
-
-Or you can also include a full page image. See next slide.
+## Checkups by Region
+&lt;img src="presentation_files/figure-html/checkups-by-region1-1.png" width="70%" /&gt;
 
 ---
 
-background-image: url(img/watercolour_sys02_img32_percolate.jpg)
+## Checkups by Region
+
+&lt;img src="presentation_files/figure-html/checkups-by-region1-again-1.png" width="70%" /&gt;
 
 ---
 
-## Math Expressions
+## Checkups by Region
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;ANOVA: Checkups per capita (log scale), by Region&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; Term &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Statistic &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; region &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.156728 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006384 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &amp;#36;\alpha+\beta$ renders `\(\alpha+\beta\)`. You can use the display style with double dollar signs:
+---
 
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
+## Checkups by City Size
+&lt;img src="presentation_files/figure-html/Simple-Marginal-Relationship4-1.png" width="70%" /&gt;
 
-`$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$`
+---
 
-Limitations:
+## Checkups by City Size
+&lt;img src="presentation_files/figure-html/Simple-Marginal-Relationship5-1.png" width="70%" /&gt;
 
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
+---
 
-1. There should not be spaces after the opening `$` or before the closing `$`.
+## Checkups by City Size
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;ANOVA: Checkups per capita (log scale), by Region&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; Term &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Statistic &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; city_size &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 671.303 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+---
+class: inverse, middle, center
+
+# Modeling
+
+---
+
+## Multiple Logistic Regression Model
+
+
+We created a Logistic Regression Model because we wanted to model the binary outcome of whether or not individuals in a certain city were getting checkups or not. 
+
+Model 1: Without Interaction
+`$$log(\frac{\pi_{i}}{\pi-1})=\beta_{0} + \beta_{1}*Region + \beta_{2}*CitySize + \beta_{3}HealthInsurance$$`
+Model 2: With Interaction
+`$$log(\frac{\pi_{i}}{\pi-1})=\beta_{0} + \beta_{1}*Region + \beta_{2}*CitySize + \beta_{3}HealthInsurance + \beta_{1}*Region*CitySize +$$`
+
+`$$\beta_{2}*Region*HealthInsurance + \beta_{3}CitySize*HealthInsurance$$`
+
+---
+
+## Model 1
+&lt;table class=" lightable-classic table" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Model 1: Without Interaction&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.6389210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Northeast &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.2198744 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.1097232 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.7578854 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0134531 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9971140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0006591 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Small-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9823377 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9940535 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Model 2
+&lt;table class=" lightable-classic table" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Model 2: With Interaction&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Northeast &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.2069474 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.3160687 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8218240 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9552848 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0484961 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Small-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9584166 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0017308 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Northeast by Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.1633244 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South by Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.1398068 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West by Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9746826 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Northeast by Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.1670750 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South by Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9013015 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West by Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8347579 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 ---
 
 class: inverse, middle, center
 
-# Wrap up
+# Model Validation
+
+
 
 ---
 
-## Feeling adventurous?
+## RMSE Against Training Set
 
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
 
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect the majority of you will do. You will differentiate yourself with the content of your presentation.
 
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
+.pull-left[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;RMSE of Model 1 Against Traning Dataset&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; RMSE &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; rmse &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0613603 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
 
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+.pull-right[
+&lt;table class=" lightable-classic table" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;RMSE of Model 2 Against Traning Dataset&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; RMSE &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; rmse &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0613603 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+## RMSE Against Test Set
+
+
+
+.pull-left[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;RMSE of Model 1 Against Test Dataset&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; RMSE &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; rmse &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0612217 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.pull-right[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;RMSE of Model 2 Against Test Dataset&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; RMSE &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; rmse &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0640844 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Results
+
+&lt;table class=" lightable-classic table" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Model 1: Without Interaction&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;font-weight: bold;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;font-weight: bold;"&gt; P-Value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.6389210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Northeast &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.2198744 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.1097232 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.7578854 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Medium-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0134531 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Metropolitan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9971140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0006591 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Small-Size Urban &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9823377 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9940535 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Discussion
+
+- Impact of Different Regions on Predicted Checkups
+- Impact of Different City Sizes on Predicted Checkups
+- Impact of HI on Predicted Checkups
+
+---
+
+## Limitations
+
+- Unequal number of cities for each city size
+- Data set only includes 500 largest cities in the US
+- Other significant predictors that are not included in this particular dataset
+
+---
+
+## Potential Implications
+
+- Suggestions for further research: Why are cities in the West less likely to have a high prevalence of checkups?
+- Results of the model as it pertains to prevalence of lack of health insurance: Increased prevalence of health insurance is correlated to greater amount of checkups per capita, and therefore to increased prevalence of screening for various diseases.
+- Mortality: Studies show link from increased screening to decreased mortality.
+- Lowered mortality rates may be achieved with greater prevalence of health insurance.
+
+---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
